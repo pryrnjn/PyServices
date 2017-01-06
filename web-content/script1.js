@@ -1,39 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Social Feed</title>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
-            integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
-            crossorigin="anonymous"></script>
-    <script src="https://cdn.datatables.net/1.10.13/js/jquery.dataTables.min.js"></script>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
-          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.13/css/jquery.dataTables.min.css">
-
-</head>
-<body class="col-sm-offset-1">
-<div class="row">
-    <div class="col-sm-10">
-        <div class="input-group">
-            <input id="search_input" type="text" class="form-control"
-                   placeholder="Enter a query to search in Instagram+Twitter">
-            <span class="input-group-btn">
-        <button id="search_btn" class="btn btn-default" type="button">Search</button>
-      </span>
-        </div>
-    </div>
-</div>
-<div name="results" class="col-sm-10" style="margin-top: 2%">
-    <table id="dataTbl" class="display" cellspacing="0" width="100%"></table>
-</div>
-<script>
 /**
  * Created by pryrnjn on 6/1/17.
  */
 var FEED_URL = "http://54.152.65.154:8080/feed?q={searchTerm}";
-//var FEED_URL = "http://localhost:8080/feed?q={searchTerm}";
+var FEED_URL = "http://localhost:8080/feed?q={searchTerm}";
 
 function getIcon(source) {
     switch (source) {
@@ -88,9 +57,3 @@ function bindEvents() {
     $("#search_btn").click(search)
 }
 
-
-
-    bindEvents();
-</script>
-</body>
-</html>

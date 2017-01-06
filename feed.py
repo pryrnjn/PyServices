@@ -9,9 +9,8 @@ instagram_api = InstagramAPI(access_token="838346436.7334de0.9c346c16a42a4adeb43
                              client_secret="8438f728ca2944d086c119aca1fbce34")
 
 
-class JSONSerializable(object):
-    def __repr__(self):
-        return json.dumps(self.__dict__)
+class Source:
+    TWITTER, INSTAGRAM = "twitter", "instagram"
 
 
 class Feed:
@@ -19,16 +18,17 @@ class Feed:
         pass
 
 
-class Content():
-    def __init__(self, text, img, link, owner, created_at):
+class Content:
+    def __init__(self, text, img, link, owner, created_at, source):
         self.text = text
         self.img = img
         self.link = link
         self.owner = owner
         self.created_at = created_at
+        self.source = source
 
 
-class User():
+class User:
     def __init__(self, name, userid, link, img):
         self.name = name
         self.userid = userid
@@ -45,11 +45,9 @@ def get_twitter_feed(term="narendra modi"):
     results = []
     for res in t_results:
         owner_user = User(res.user.name, res.user.screen_name, res.user.url, res.user.profile_image_url)
-        if (len(res.media) > 0):
-            pass
         content = Content(res.text, res.media[0].get("media_url_https", "") if (len(res.media) > 0) else "",
                           res.urls[0].url if (len(res.urls) > 0) else "", owner_user,
-                          res.created_at_in_seconds)
+                          res.created_at_in_seconds, Source.TWITTER)
         results.append(content)
     return results
 
@@ -63,7 +61,6 @@ def get_instagram_feed(term="narendra modi"):
         results.append(media.caption.text)
 
     return results
-
 
 # get_instagram_feed("morning")
 # get_twitter_feed("narendra modi")
