@@ -1,6 +1,11 @@
+import sys
+import traceback
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 from urlparse import urlparse
-import sys
+
+import os
+
+dir = os.path.dirname(__file__)
 
 PORT_NUMBER = 8080
 
@@ -16,7 +21,11 @@ class MainController(BaseHTTPRequestHandler):
             self.send_response(200)
             self.send_header('Content-type', 'text/html')
             self.end_headers()
-            self.wfile.write("Hello World!")
+            try:
+                self.wfile.write(open(os.path.join(dir, "web-content", "index.html"), 'rb').read())
+            except:
+                traceback.print_exc()
+                self.wfile.write("Something Wrong!")
         return
 
 
