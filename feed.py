@@ -66,4 +66,4 @@ def get_instagram_feed(term="narendra modi"):
 
 
 # get_instagram_feed("morning")
-get_twitter_feed("narendra modi")
+# get_twitter_feed("narendra modi")

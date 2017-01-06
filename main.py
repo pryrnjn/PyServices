@@ -1,5 +1,6 @@
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 from urlparse import urlparse
+import sys
 
 PORT_NUMBER = 8080
 
@@ -21,6 +22,8 @@ class MainController(BaseHTTPRequestHandler):
 
 if __name__ == "__main__":
     try:
+        args = sys.argv[1:]
+        PORT_NUMBER = int(args[0]) if len(args) else PORT_NUMBER
         # Creating the web server and asigning the handler
         server = HTTPServer(('', PORT_NUMBER), MainController)
         print('Started httpserver on port ', PORT_NUMBER)
