@@ -46,7 +46,7 @@ def get_twitter_feed(term="narendra modi"):
     for res in t_results:
         owner_user = User(res.user.name, res.user.screen_name, res.user.url, res.user.profile_image_url)
         content = Content(res.text,
-                          res.media[0]["media_url_https"] if (res.media and len(res.media) > 0) else "",
+                          res.media[0].media_url_https if (res.media and len(res.media) > 0) else "",
                           res.urls[0].url if (len(res.urls) > 0) else "",
                           owner_user,
                           res.created_at_in_seconds,
