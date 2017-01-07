@@ -2,7 +2,7 @@ import json
 import traceback
 from urlparse import parse_qs
 
-from feed import *
+from feedControllerHelper import *
 
 print "importing"
 

@@ -34,7 +34,7 @@ if __name__ == "__main__":
         args = sys.argv[1:]
         PORT_NUMBER = int(args[0]) if len(args) else PORT_NUMBER
         # Creating the web server and asigning the handler
-        server = HTTPServer(('', PORT_NUMBER), MainController)
+        server = HTTPServer(('0.0.0.0', PORT_NUMBER), MainController)
         print('Started httpserver on port ', PORT_NUMBER)
 
         # Wait forever for incoming http requests
