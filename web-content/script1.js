@@ -6,7 +6,11 @@ var FEED_URL = "http://localhost:8080/feed?q={searchTerm}";
 
 function fetchResults(key, cb) {
     if (typeof cb != "function") throw new Error("Invalid callback");
-    $.get(FEED_URL.replace("{searchTerm}", key), cb);
+    $.get(FEED_URL.replace("{searchTerm}", key), cb)
+        .fail(function (err) {
+            alert(err.responseText);
+//                throw new Error(err.responseText);
+        });
 }
 
 function getSearchKey() {
@@ -14,23 +18,24 @@ function getSearchKey() {
 }
 
 function populateResultsTbl(data) {
-    if ($.fn.dataTable.isDataTable('#dataTbl')) {
-        var dataTbl = $('#dataTbl').dataTable();
-        dataTbl.fnClearTable();
-        dataTbl.fnAddData(data);
-//            dataTbl.fnDraw();
-    } else {
+    if (!$.fn.dataTable.isDataTable('#dataTbl')) {
         $('#dataTbl').dataTable({
             retrieve: true,
             paging: false,
             search: true,
             order: false,
-            data: data,
+            //data: data,
             columns: [
                 {title: "Content"},
                 {title: "Date", visible: false}
             ]
         });
+    }
+    var dataTbl = $('#dataTbl').dataTable();
+    dataTbl.fnClearTable();
+    if (data instanceof Array && data.length > 0) {
+        dataTbl.fnAddData(data);
+        // dataTbl.fnDraw();
     }
 }
 function search() {
