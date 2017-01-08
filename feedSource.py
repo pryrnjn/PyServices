@@ -1,6 +1,5 @@
 import json
 import requests
-from UserString import MutableString
 from abc import ABCMeta, abstractmethod, abstractproperty
 
 
@@ -28,9 +27,13 @@ class FeedSource:
     def build_content(self):
         pass
 
+    def remove_duplicacy(self):
+        pass
+
     def get_content(self):
-        self.fetch_feed()
-        self.build_content()
+        self.fetch_feed()  # populate raw_results
+        self.remove_duplicacy()  # refine raw_results
+        self.build_content()  # build list of Content to return
         return self.contents
 
 
@@ -88,13 +91,16 @@ class Instagram(FeedSource):
 
     def fetch_feed(self):
         # self.raw_results = self.api.tag_recent_media(20, None, self.term.replace(" ", ""))
-        url = self.tag_search_url.format(tag=self.term.replace(" ", ""), access_token=self.access_token)
-        resp = requests.get(url)
-        self.raw_results = json.loads(resp.content)
+        tags = self.term.split()
+        self.raw_results = []  # assuming response wud be json array
+        for tag in tags:
+            url = self.tag_search_url.format(tag=tag, access_token=self.access_token)
+            resp = requests.get(url)
+            self.raw_results += json.loads(resp.content)["data"]
 
     def build_content(self):
         self.contents = list()
-        for res in self.raw_results.get("data", {}):
+        for res in self.raw_results:
             owner_user = User(res.get("user", {}).get("full_name", ""),
                               res.get("user", {}).get("username", ""),
                               self.build_user_link(res.get("user", {}).get("username", "")),
@@ -107,6 +113,17 @@ class Instagram(FeedSource):
                               "",
                               SourceName.INSTAGRAM)
             self.contents.append(content)
+
+    def remove_duplicacy(self):
+        super(Instagram, self).remove_duplicacy()
+        unique_ids = set()
+        temp_results = self.raw_results
+        self.raw_results = []
+        for i in range(0, len(temp_results)):
+            record = temp_results[i]
+            if record["id"] not in unique_ids:
+                unique_ids.add(record["id"])
+                self.raw_results.append(record)
 
     def build_user_link(self, userid):
         return "https://instagram.com/" + userid
