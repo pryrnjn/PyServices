@@ -61,7 +61,7 @@ class Twitter(FeedSource):
                               res.user.screen_name,
                               self.build_user_link(res.user.screen_name),
                               res.user.profile_image_url)
-            content = Content(res.text,
+            content = Content(res.id, res.text,
                               res.media[0].media_url_https if (res.media and len(res.media) > 0) else "",
                               self.build_content_link(res.user.screen_name, res.id_str),
                               owner_user,
@@ -105,7 +105,7 @@ class Instagram(FeedSource):
                               res.get("user", {}).get("username", ""),
                               self.build_user_link(res.get("user", {}).get("username", "")),
                               res.get("user", {}).get("profile_picture", ""))
-            content = Content(res.get("caption", {}).get("text", ""),
+            content = Content(res["id"], res.get("caption", {}).get("text", ""),
                               res.get("images", {}).get("standard_resolution", {}).get("url", ""),
                               res.get("link"),
                               owner_user,
@@ -130,7 +130,8 @@ class Instagram(FeedSource):
 
 
 class Content:
-    def __init__(self, text, img, link, owner, created_at, html, source):
+    def __init__(self, id, text, img, link, owner, created_at, html, source):
+        self.id = id
         self.text = text
         self.img = img
         self.link = link

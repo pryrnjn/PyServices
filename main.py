@@ -8,7 +8,16 @@ import os
 dir = os.path.dirname(__file__)
 
 PORT_NUMBER = 8080
+import pusher
 
+global pusher_client
+pusher_client = pusher.Pusher(
+    app_id='287804',
+    key='772c22382c098e14619e',
+    secret='dc7d5f4df95fb0061fbd',
+    ssl=True
+)
+active_channels = set()
 
 class MainController(BaseHTTPRequestHandler):
     # Handler for the GET requests

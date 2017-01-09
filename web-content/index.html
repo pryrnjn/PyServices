@@ -8,6 +8,7 @@
             integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
             crossorigin="anonymous"></script>
     <script src="https://cdn.datatables.net/1.10.13/js/jquery.dataTables.min.js"></script>
+    <script src="//js.pusher.com/4.0/pusher.min.js"></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
           integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.13/css/jquery.dataTables.min.css">
@@ -27,82 +28,123 @@
     <table id="dataTbl" class="display" cellspacing="0" width="100%"></table>
 </div>
 <script>
-    /**
-     * Created by pryrnjn on 6/1/17.
-     */
-    var FEED_URL = "/feed?q={searchTerm}";
-    var FEED_URL = "http://localhost:8080/feed?q={searchTerm}";
+/**
+ * Created by pryrnjn on 6/1/17.
+ */
+var FEED_URL = "/feed?q={searchTerm}";
+//var FEED_URL = "http://localhost:8080/feed?q={searchTerm}";
 
-    function fetchResults(key, cb) {
-        if (typeof cb != "function") throw new Error("Invalid callback");
-        $.get(FEED_URL.replace("{searchTerm}", key), cb)
-            .fail(function (err) {
-                alert(err.responseText);
+// Enable pusher logging - don't include this in production
+Pusher.logToConsole = true;
+
+var pusher = new Pusher('772c22382c098e14619e', {
+    encrypted: true
+});
+Pusher.logToConsole = true;
+
+var CHANNEL_NAME = "";
+var EVENT_NAME = "feed";
+
+function subscribeChannel(channel, event) {
+    var channel = pusher.subscribe(channel);
+    channel.bind(event, function (data) {
+        populateResultsTbl(parseData(data), true);
+
+    });
+}
+function unSubscribeChannel(channel) {
+    pusher.unsubscribe(channel);
+}
+
+function getChannelName(key){
+    return key.split(" ").join(".");
+}
+
+function fetchResults(key, cb) {
+    if (typeof cb != "function") throw new Error("Invalid callback");
+    $.get(FEED_URL.replace("{searchTerm}", key), cb)
+        .fail(function (err) {
+            alert(err.responseText);
 //                throw new Error(err.responseText);
-            });
-    }
-
-    function getSearchKey() {
-        return $("#search_input").val();
-    }
-
-    function populateResultsTbl(data) {
-        if (!$.fn.dataTable.isDataTable('#dataTbl')) {
-            $('#dataTbl').dataTable({
-                retrieve: true,
-                paging: false,
-                search: true,
-                order: false,
-                //data: data,
-                columns: [
-                    {title: "Content"},
-                    {title: "Date", visible: false}
-                ]
-            });
+        }).done(function () {
+        if (getChannelName(key) != CHANNEL_NAME) {
+            unSubscribeChannel(CHANNEL_NAME);
+            CHANNEL_NAME = getChannelName(key);
+            subscribeChannel(CHANNEL_NAME, EVENT_NAME);
         }
-        var dataTbl = $('#dataTbl').dataTable();
+    });
+}
+
+function getSearchKey() {
+    return $.trim($("#search_input").val());
+}
+
+function populateResultsTbl(data, isAppend) {
+    if (!$.fn.dataTable.isDataTable('#dataTbl')) {
+        $('#dataTbl').dataTable({
+            retrieve: true,
+            paging: true,
+            search: true,
+            order: false,
+            data: [],
+            columns: [
+                {title: "Content"},
+                {title: "Date", visible: false}
+            ],
+            "aaSortingFixed": [[1, 'desc']]
+        });
+    }
+    var dataTbl = $('#dataTbl').dataTable();
+    if (!isAppend) {
         dataTbl.fnClearTable();
-        if (data instanceof Array && data.length > 0) {
-            dataTbl.fnAddData(data);
-            // dataTbl.fnDraw();
-        }
     }
-    function search() {
-        fetchResults(getSearchKey(), function (resp) {
-            var data = [];
-            for (var i in resp) {
-                var record = resp[i];
-                var html = "<div>"
-                    + "<div>" + getImgWidget(record.img) + "</div>"
-                    + "<div>" + record.text + "</div>"
-                    + "<div>" + getLinkWidget(record.link, record.source) + " - " + getLinkWidget(record.owner.link, record.owner.name) + " " + new Date(record.created_at * 1000).toLocaleString() + "</div>"
-                    + "</div>";
-                data.push([html, record.created_at])
-            }
-            populateResultsTbl(data);
-        })
+    if (data instanceof Array && data.length > 0) {
+        dataTbl.fnAddData(data);
     }
-    function getImgWidget(src, width, height) {
-        if (src)
-            if (width && height)
-                return "<img width='" + width + "' height='" + height + "' src='" + src + "'>";
-            else
-                return "<img src='" + src + "'>";
-        return "";
-    }
+}
 
-    function getLinkWidget(link, name) {
-        if (link || name) {
-            return "<a target='_blank' href='" + link + "'>" + name + "</a>";
-        }
-        return ""
-    }
-    function bindEvents() {
-        $("#search_input").bind("enterKey", search)
-        $("#search_btn").click(search)
-    }
+function search() {
+    fetchResults(getSearchKey(), function (resp) {
+        populateResultsTbl(parseData(resp));
+    })
+}
 
-    bindEvents();
+function parseData(inputData) {
+    var data = [];
+    for (var i in inputData) {
+        var record = inputData[i];
+        var html = "<div>"
+            + "<div>" + getImgWidget(record.img) + "</div>"
+            + "<div>" + record.text + "</div>"
+            + "<div>" + getLinkWidget(record.link, record.source) + " - " + getLinkWidget(record.owner.link, record.owner.name) + " " + new Date(record.created_at * 1000).toLocaleString() + "</div>"
+            + "</div>";
+        data.push([html, record.created_at])
+    }
+    return data;
+}
+
+function getImgWidget(src, width, height) {
+    if (src)
+        if (width && height)
+            return "<img width='" + width + "' height='" + height + "' src='" + src + "'>";
+        else
+            return "<img src='" + src + "'>";
+    return "";
+}
+
+function getLinkWidget(link, name) {
+    if (link || name) {
+        return "<a target='_blank' href='" + link + "'>" + name + "</a>";
+    }
+    return ""
+}
+function bindEvents() {
+    $("#search_input").bind("enterKey", search);
+    $("#search_btn").click(search);
+}
+
+
+   bindEvents();
 </script>
 </body>
 </html>
