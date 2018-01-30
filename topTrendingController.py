@@ -1,6 +1,4 @@
 import csv
-import glob
-import os
 import traceback
 from urlparse import parse_qs
 
@@ -12,14 +10,13 @@ loaded_data = []
 
 
 def load_data():
-    data_files = glob.glob(os.path.join("data/instagram/", 'instagram_*_*.csv'))
+    file_path = "data/instagram/instagram.csv"
 
-    for file_path in data_files:
-        with open(file_path, 'rb') as csv_file:
-            reader = csv.reader(csv_file)
-            reader.next()
-            for row in reader:
-                loaded_data.append(row)
+    with open(file_path, 'rb') as csv_file:
+        reader = csv.reader(csv_file)
+        reader.next()
+        for row in reader:
+            loaded_data.append(row)
     loaded_data.sort(key=lambda x: x[2], reverse=True)
 
 
