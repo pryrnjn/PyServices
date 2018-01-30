@@ -4,147 +4,133 @@
     <meta charset="UTF-8">
     <title>Social Feed</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
-            integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
-            crossorigin="anonymous"></script>
-    <script src="https://cdn.datatables.net/1.10.13/js/jquery.dataTables.min.js"></script>
-    <script src="//js.pusher.com/4.0/pusher.min.js"></script>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
-          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.13/css/jquery.dataTables.min.css">
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.5/angular.min.js">   </script>
+    <script src="//platform.instagram.com/en_US/embeds.js"></script>
 </head>
 <body class="col-sm-offset-1 col-sm-10" style="padding-top: 2%;">
-<div>
-    <div class="input-group">
-        <input id="search_input" type="text" class="form-control"
-               placeholder="Enter a query to search in Instagram+Twitter">
-        <span class="input-group-btn">
-        <button id="search_btn" class="btn btn-default" type="button">Search</button>
-      </span>
+<div style="margin-left: 140px;">
+    <h3>Feed</h3>
+</div>
+
+<div ng-app='myApplication' ng-controller='AppController'>
+  <div infinite-scroll='feed.nextPage()' infinite-scroll-disabled='feed.busy' infinite-scroll-distance='0'>
+    <div id="feed" style="margin-left: 140px;">
+        <!--<iframe ng-src="{{item | trusted}}" frameborder="0" allowfullscreen></iframe>-->
     </div>
+    </div>
+    <div ng-show='feed.busy'>Loading data...</div>
+  </div>
 </div>
-<div name="results" style="margin-top: 2%">
-    <table id="dataTbl" class="display" cellspacing="0" width="100%"></table>
-</div>
+<!--https://material.angularjs.org/latest/demo/virtualRepeat-->
 <script>
-/**
- * Created by pryrnjn on 6/1/17.
- */
-var FEED_URL = "/feed?q={searchTerm}";
-//var FEED_URL = "http://localhost:8080/feed?q={searchTerm}";
-
-// Enable pusher logging - don't include this in production
-Pusher.logToConsole = true;
-
-var pusher = new Pusher('772c22382c098e14619e', {
-    encrypted: true
-});
-Pusher.logToConsole = true;
-
-var CHANNEL_NAME = "";
-var EVENT_NAME = "feed";
-
-function subscribeChannel(channel, event) {
-    var channel = pusher.subscribe(channel);
-    channel.bind(event, function (data) {
-        populateResultsTbl(parseData(data), true);
-
-    });
-}
-function unSubscribeChannel(channel) {
-    pusher.unsubscribe(channel);
-}
-
-function getChannelName(key){
-    return key.split(" ").join(".");
-}
-
-function fetchResults(key, cb) {
-    if (typeof cb != "function") throw new Error("Invalid callback");
-    $.get(FEED_URL.replace("{searchTerm}", key), cb)
-        .fail(function (err) {
-            alert(err.responseText);
-//                throw new Error(err.responseText);
-        }).done(function () {
-        if (getChannelName(key) != CHANNEL_NAME) {
-            unSubscribeChannel(CHANNEL_NAME);
-            CHANNEL_NAME = getChannelName(key);
-            subscribeChannel(CHANNEL_NAME, EVENT_NAME);
+/* ng-infinite-scroll - v1.0.0 - 2013-02-23 */
+angular.module('infinite-scroll', [])
+.directive('infiniteScroll', [
+  '$rootScope', '$window', '$timeout', function($rootScope, $window, $timeout) {
+    return {
+      link: function(scope, elem, attrs) {
+        var checkWhenEnabled, handler, scrollDistance, scrollEnabled;
+        $window = angular.element($window);
+        scrollDistance = 0;
+        if (attrs.infiniteScrollDistance != null) {
+          scope.$watch(attrs.infiniteScrollDistance, function(value) {
+            return scrollDistance = parseInt(value, 10);
+          });
         }
-    });
-}
-
-function getSearchKey() {
-    return $.trim($("#search_input").val());
-}
-
-function populateResultsTbl(data, isAppend) {
-    if (!$.fn.dataTable.isDataTable('#dataTbl')) {
-        $('#dataTbl').dataTable({
-            retrieve: true,
-            paging: true,
-            search: true,
-            order: false,
-            data: [],
-            columns: [
-                {title: "Content"},
-                {title: "Date", visible: false}
-            ],
-            "aaSortingFixed": [[1, 'desc']]
+        scrollEnabled = true;
+        checkWhenEnabled = false;
+        if (attrs.infiniteScrollDisabled != null) {
+          scope.$watch(attrs.infiniteScrollDisabled, function(value) {
+            scrollEnabled = !value;
+            if (scrollEnabled && checkWhenEnabled) {
+              checkWhenEnabled = false;
+              return handler();
+            }
+          });
+        }
+        handler = function() {
+          var elementBottom, remaining, shouldScroll, windowBottom;
+          windowBottom = $window.height() + $window.scrollTop();
+          elementBottom = elem.offset().top + elem.height();
+          remaining = elementBottom - windowBottom;
+          shouldScroll = remaining <= $window.height() * scrollDistance;
+          if (shouldScroll && scrollEnabled) {
+            if ($rootScope.$$phase) {
+              return scope.$eval(attrs.infiniteScroll);
+            } else {
+              return scope.$apply(attrs.infiniteScroll);
+            }
+          } else if (shouldScroll) {
+            return checkWhenEnabled = true;
+          }
+        };
+        $window.on('scroll', handler);
+        scope.$on('$destroy', function() {
+          return $window.off('scroll', handler);
         });
-    }
-    var dataTbl = $('#dataTbl').dataTable();
-    if (!isAppend) {
-        dataTbl.fnClearTable();
-    }
-    if (data instanceof Array && data.length > 0) {
-        dataTbl.fnAddData(data);
-    }
-}
+        return $timeout((function() {
+          if (attrs.infiniteScrollImmediateCheck) {
+            if (scope.$eval(attrs.infiniteScrollImmediateCheck)) {
+              return handler();
+            }
+          } else {
+            return handler();
+          }
+        }), 0);
+      }
+    };
+  }
+]);
 
-function search() {
-    fetchResults(getSearchKey(), function (resp) {
-        populateResultsTbl(parseData(resp));
+angular.module('myApplication', ['infinite-scroll']);
+
+angular.module('myApplication')
+  .controller('AppController', function($scope, InstaFeed){
+      $scope.feed = new InstaFeed();
     })
-}
+  .factory('InstaFeed', function($http) {
+      var InstaFeed = function() {
+        this.items = [];
+        this.busy = false;
+        this.nextUrl = "/trending?limit=5";
+      };
 
-function parseData(inputData) {
-    var data = [];
-    for (var i in inputData) {
-        var record = inputData[i];
-        var html = "<div>"
-            + "<div>" + getImgWidget(record.img) + "</div>"
-            + "<div>" + record.text + "</div>"
-            + "<div>" + getLinkWidget(record.link, record.source) + " - " + getLinkWidget(record.owner.link, record.owner.name) + " " + new Date(record.created_at * 1000).toLocaleString() + "</div>"
-            + "</div>";
-        data.push([html, record.created_at])
-    }
-    return data;
-}
+      InstaFeed.prototype.nextPage = function() {
+        if (this.busy || !this.nextUrl) return;
+        this.busy = true;
+        $http.get(this.nextUrl)
+            .then(function(data) {
+              data = data.data;
+              var items = data.feed;
+              for (var i = 0; i < items.length; i++) {
+                var mediaUrl = items[i][1];
+                this.items.push(mediaUrl);
+                $http.get("http://api.instagram.com/oembed/?omitscript=true&url="+mediaUrl)
+                    .then(function(resp) {
+                        if (resp.data && resp.data.html){
 
-function getImgWidget(src, width, height) {
-    if (src)
-        if (width && height)
-            return "<img width='" + width + "' height='" + height + "' src='" + src + "'>";
-        else
-            return "<img src='" + src + "'>";
-    return "";
-}
+                            $('#feed').append($(resp.data.html));
+                            instgrm.Embeds.process();
+                        }
+                    }.bind(this), function(resp) {
+                        //console.log(resp);
+                    }.bind(this));
+              }
+              this.nextUrl = data.next || undefined;
+            }.bind(this))
+            .finally(function(){
+              this.busy = false;
+            }.bind(this));
+      };
 
-function getLinkWidget(link, name) {
-    if (link || name) {
-        return "<a target='_blank' href='" + link + "'>" + name + "</a>";
-    }
-    return ""
-}
-function bindEvents() {
-    $("#search_input").bind("enterKey", search);
-    $("#search_btn").click(search);
-}
-
-
-   bindEvents();
+      return InstaFeed;
+  })
+  .filter('trusted', ['$sce', function ($sce) {
+    return function(url) {
+        return $sce.trustAsResourceUrl("http://api.instagram.com/oembed/?omitscript=true&url=" + url);
+    };
+}]);
+;
 </script>
 </body>
 </html>

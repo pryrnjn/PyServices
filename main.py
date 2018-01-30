@@ -1,31 +1,25 @@
+import os
 import sys
 import traceback
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 from urlparse import urlparse
 
-import os
-
 dir = os.path.dirname(__file__)
 
 PORT_NUMBER = 8080
-import pusher
 
-global pusher_client
-pusher_client = pusher.Pusher(
-    app_id='287804',
-    key='772c22382c098e14619e',
-    secret='dc7d5f4df95fb0061fbd',
-    ssl=True
-)
-active_channels = set()
 
 class MainController(BaseHTTPRequestHandler):
     # Handler for the GET requests
+
     def do_GET(self):
         path_obj = urlparse(self.path)
-        if path_obj.path.find("/feed") == 0:
-            from feedController import FeedController
-            FeedController(self).do_GET(path_obj)
+        if path_obj.path.find("/trending") == 0:
+            from topTrendingController import TopTrendingController
+            TopTrendingController(self).do_GET(path_obj)
+        elif path_obj.path.find("/update/score") == 0:
+            from topTrendingController import TopTrendingController
+            TopTrendingController(self).update_score(path_obj)
         else:
             self.send_response(200)
             self.send_header('Content-type', 'text/html')
