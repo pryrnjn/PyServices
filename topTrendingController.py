@@ -1,12 +1,12 @@
 import csv
 import traceback
 from urlparse import parse_qs
-
+import re
 from utils import *
 
-print "importing"
-
+date_matcher = re.compile(r'\d{4}-\d{2}-\d{2}')
 loaded_data = []
+score_data = dict()
 
 
 def load_data():
@@ -17,7 +17,13 @@ def load_data():
         reader.next()
         for row in reader:
             loaded_data.append(row)
-    loaded_data.sort(key=lambda x: x[2], reverse=True)
+    loaded_data.sort(key=lambda x: (date_matcher.match(x[2]).group(), int(x[3])), reverse=True)
+
+
+def update_score(url, score):
+    if url not in score_data:
+        score_data[url] = 0
+    score_data[url] += score
 
 
 load_data()
@@ -26,6 +32,8 @@ load_data()
 class TopTrendingController:
     def __init__(self, server):
         self.server = server
+    def __del__(self):
+        pass
 
     def do_GET(self, path_obj=None):
         query_arr = parse_qs(path_obj.query) or {}
@@ -46,3 +54,8 @@ class TopTrendingController:
         self.server.send_header('Content-type', 'application/json')
         self.server.end_headers()
         self.server.wfile.write(response)
+
+    def do_PUT(self, path_obj=None):
+        query_arr = parse_qs(path_obj.query) or {}
+        url = int(query_arr.get("url", [None])[0])
+        score = int(query_arr.get("score", [0])[0])
