@@ -4,7 +4,9 @@ import traceback
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 from urlparse import urlparse
 
-dir = os.path.dirname(__file__)
+import topTrendingController
+
+# dir = os.path.dirname(__file__)
 
 PORT_NUMBER = 8080
 
@@ -14,12 +16,12 @@ class MainController(BaseHTTPRequestHandler):
 
     def do_GET(self):
         path_obj = urlparse(self.path)
-        if path_obj.path.find("/trending") == 0:
+        if path_obj.path.find("/trending/update") == 0:
+            from topTrendingController import TopTrendingController
+            TopTrendingController(self).do_PUT(path_obj)
+        elif path_obj.path.find("/trending") == 0:
             from topTrendingController import TopTrendingController
             TopTrendingController(self).do_GET(path_obj)
-        elif path_obj.path.find("/update/score") == 0:
-            from topTrendingController import TopTrendingController
-            TopTrendingController(self).update_score(path_obj)
         else:
             self.send_response(200)
             self.send_header('Content-type', 'text/html')
@@ -30,6 +32,11 @@ class MainController(BaseHTTPRequestHandler):
                 traceback.print_exc()
                 self.wfile.write("Something Wrong!")
         return
+
+
+def cleanup():
+    print 'cleanup!!'
+    topTrendingController.execute_update(True)
 
 
 if __name__ == "__main__":
@@ -43,6 +50,6 @@ if __name__ == "__main__":
         # Wait forever for incoming http requests
         server.serve_forever()
 
-    except KeyboardInterrupt:
-        print 'KeyboardInterrupt, shutting down the web server'
+    finally:
         server.socket.close()
+        cleanup()

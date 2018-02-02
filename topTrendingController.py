@@ -1,23 +1,35 @@
 import csv
+import os
+import re
+import threading
 import traceback
 from urlparse import parse_qs
-import re
+
 from utils import *
 
 date_matcher = re.compile(r'\d{4}-\d{2}-\d{2}')
+file_path = "data/instagram/instagram.csv"
+last_modified_date = {'d': 0}
 loaded_data = []
+header = None
 score_data = dict()
 
 
 def load_data():
-    file_path = "data/instagram/instagram.csv"
-
+    last_modified_date['d'] = os.path.getmtime(file_path)
+    del loaded_data[:]
     with open(file_path, 'rb') as csv_file:
         reader = csv.reader(csv_file)
-        reader.next()
+        header = reader.next()
         for row in reader:
             loaded_data.append(row)
     loaded_data.sort(key=lambda x: (date_matcher.match(x[2]).group(), int(x[3])), reverse=True)
+
+
+def refresh_data():
+    if os.path.getmtime(file_path) > last_modified_date['d']:
+        load_data()
+    threading.Timer(137, refresh_data).start()
 
 
 def update_score(url, score):
@@ -26,14 +38,32 @@ def update_score(url, score):
     score_data[url] += score
 
 
-load_data()
+def execute_update(final=False):
+    if len(score_data):
+        with open(file_path, 'rb') as csv_file:
+            writer = csv.writer(csv_file)
+            for row in loaded_data:
+                score = score_data.get(row[1], 0)
+                row[3] += score
+                if row[3] > -10:
+                    writer.writerow(row)
+        last_modified_date['d'] = os.path.getmtime(file_path)
+        loaded_data.sort(key=lambda x: (date_matcher.match(x[2]).group(), int(x[3])), reverse=True)
+    if not final:
+        threading.Timer(120, execute_update).start()
+
+
+def cleanup():
+    execute_update(final=True)
+
+
+refresh_data()
+execute_update()
 
 
 class TopTrendingController:
     def __init__(self, server):
         self.server = server
-    def __del__(self):
-        pass
 
     def do_GET(self, path_obj=None):
         query_arr = parse_qs(path_obj.query) or {}
@@ -57,5 +87,7 @@ class TopTrendingController:
 
     def do_PUT(self, path_obj=None):
         query_arr = parse_qs(path_obj.query) or {}
-        url = int(query_arr.get("url", [None])[0])
+        url = query_arr.get("url", [None])[0]
         score = int(query_arr.get("score", [0])[0])
+        if url and score != 0:
+            update_score(url, score)
