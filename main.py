@@ -6,7 +6,7 @@ from urlparse import urlparse
 
 import topTrendingController
 
-# dir = os.path.dirname(__file__)
+this_dir = os.path.dirname(__file__)
 
 PORT_NUMBER = 8080
 
@@ -27,7 +27,7 @@ class MainController(BaseHTTPRequestHandler):
             self.send_header('Content-type', 'text/html')
             self.end_headers()
             try:
-                self.wfile.write(open(os.path.join(dir, "web-content", "index.html"), 'rb').read())
+                self.wfile.write(open(os.path.join(this_dir, "web-content", "index.html"), 'rb').read())
             except:
                 traceback.print_exc()
                 self.wfile.write("Something Wrong!")
