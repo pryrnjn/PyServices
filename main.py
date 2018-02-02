@@ -49,7 +49,7 @@ if __name__ == "__main__":
 
         # Wait forever for incoming http requests
         server.serve_forever()
-
-    finally:
+    except KeyboardInterrupt:
         server.socket.close()
+    finally:
         cleanup()
