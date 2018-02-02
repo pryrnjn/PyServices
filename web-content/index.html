@@ -13,9 +13,11 @@
 </div>
 
 <div ng-app='myApplication' ng-controller='AppController'>
-  <div infinite-scroll='feed.nextPage()' infinite-scroll-disabled='feed.busy' infinite-scroll-distance='0'>
+  <div infinite-scroll='feed.nextPage()' infinite-scroll-disabled='feed.busy' infinite-scroll-distance='1'>
     <div id="feed" style="margin-left: 140px;">
-        <!--<iframe ng-src="{{item | trusted}}" frameborder="0" allowfullscreen></iframe>-->
+        <div data="">
+            <button>Upvote</button> <button>Downvote</button>
+        </div>
     </div>
     </div>
     <div ng-show='feed.busy'>Loading data...</div>
@@ -130,7 +132,9 @@ angular.module('myApplication')
         return $sce.trustAsResourceUrl("http://api.instagram.com/oembed/?omitscript=true&url=" + url);
     };
 }]);
-;
+var upvote = function(){
+    
+}
 </script>
 </body>
 </html>
