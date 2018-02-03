@@ -11,6 +11,7 @@ date_matcher = re.compile(r'\d{4}-\d{2}-\d{2}')
 file_path = "data/instagram/instagram.csv"
 last_modified_date = {'d': 0}
 loaded_data = []
+removed_data = []
 header = None
 score_data = dict()
 
@@ -22,7 +23,10 @@ def load_data():
         reader = csv.reader(csv_file)
         header = reader.next()
         for row in reader:
-            loaded_data.append(row)
+            if int(row[3]) > -1:
+                loaded_data.append(row)
+            else:
+                removed_data.append(row)
     loaded_data.sort(key=lambda x: (date_matcher.match(x[2]).group(), int(x[3])), reverse=True)
 
 
@@ -40,13 +44,18 @@ def update_score(url, score):
 
 def execute_update(final=False):
     if len(score_data):
-        with open(file_path, 'rb') as csv_file:
+        with open(file_path, 'wb') as csv_file:
             writer = csv.writer(csv_file)
             for row in loaded_data:
-                score = score_data.get(row[1], 0)
-                row[3] += score
-                if row[3] > -10:
+                score = score_data.pop(row[1], 0)
+                row[3] = int(row[3]) + score
+                writer.writerow(row)
+            if score_data:
+                for row in removed_data:
+                    score = score_data.pop(row[1], 0)
+                    row[3] = int(row[3]) + score
                     writer.writerow(row)
+
         last_modified_date['d'] = os.path.getmtime(file_path)
         loaded_data.sort(key=lambda x: (date_matcher.match(x[2]).group(), int(x[3])), reverse=True)
     if not final:
@@ -89,5 +98,12 @@ class TopTrendingController:
         query_arr = parse_qs(path_obj.query) or {}
         url = query_arr.get("url", [None])[0]
         score = int(query_arr.get("score", [0])[0])
+        response = {'updated': False}
         if url and score != 0:
             update_score(url, score)
+            response['updated'] = True
+        response = build_json_response(response)
+        self.server.send_response(200)
+        self.server.send_header('Content-type', 'application/json')
+        self.server.end_headers()
+        self.server.wfile.write(response)

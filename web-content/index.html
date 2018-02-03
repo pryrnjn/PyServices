@@ -15,8 +15,14 @@
 <div ng-app='myApplication' ng-controller='AppController'>
   <div infinite-scroll='feed.nextPage()' infinite-scroll-disabled='feed.busy' infinite-scroll-distance='1'>
     <div id="feed" style="margin-left: 140px;">
-        <div data="">
-            <button>Upvote</button> <button>Downvote</button>
+        <div id={{url}} ng-repeat="url in feed.items">
+            <div class="content"></div>
+            <div class="buttons">
+                <button ng-click="updateScore(url, 100)">Superlike</button>
+                <button ng-click="updateScore(url, 10)">Upvote</button>
+                <button ng-click="updateScore(url, -10)">Downvote</button>
+                <button ng-click="updateScore(url, -100)">Bhakk</button>
+            </div>
         </div>
     </div>
     </div>
@@ -89,12 +95,24 @@ angular.module('myApplication', ['infinite-scroll']);
 angular.module('myApplication')
   .controller('AppController', function($scope, InstaFeed){
       $scope.feed = new InstaFeed();
+      $scope.updateScore = function(url, score){
+        $http.get('/trending/update?url=url&score=score')
+            .then(function(data) {
+                console.log("update status "+ data.data.updated);
+            }.bind(this));
+      };
+      $scope.updateScore = function(url, score) {
+          $.get('/trending/update?url='+url+'&score='+score, function(resp){
+            console.log("update status "+ resp.updated);
+          });
+      }
     })
   .factory('InstaFeed', function($http) {
       var InstaFeed = function() {
         this.items = [];
         this.busy = false;
         this.nextUrl = "/trending?limit=5";
+        this.notFoundItems = [];
       };
 
       InstaFeed.prototype.nextPage = function() {
@@ -110,12 +128,17 @@ angular.module('myApplication')
                 $http.get("http://api.instagram.com/oembed/?omitscript=true&url="+mediaUrl)
                     .then(function(resp) {
                         if (resp.data && resp.data.html){
-
-                            $('#feed').append($(resp.data.html));
+                            var url = resp.config.url.replace(/.*&url=/, '')
+                            $('#feed').find("[id='" + url + "']").find("[class='content']").prepend($(resp.data.html));
                             instgrm.Embeds.process();
                         }
+
                     }.bind(this), function(resp) {
-                        //console.log(resp);
+                        var url = resp.config.url.replace(/.*&url=/, '')
+                        var idx = this.items.indexOf(url);
+                        if (idx > -1)
+                            this.items.splice(idx, 1);
+                        this.notFoundItems.push(url);
                     }.bind(this));
               }
               this.nextUrl = data.next || undefined;
@@ -132,9 +155,7 @@ angular.module('myApplication')
         return $sce.trustAsResourceUrl("http://api.instagram.com/oembed/?omitscript=true&url=" + url);
     };
 }]);
-var upvote = function(){
-    
-}
+
 </script>
 </body>
 </html>
