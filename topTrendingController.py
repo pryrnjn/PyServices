@@ -9,7 +9,7 @@ from utils import *
 
 date_matcher = re.compile(r'\d{4}-\d{2}-\d{2}')
 file_path = "data/instagram/instagram.csv"
-last_modified_date = {'d': 0}
+last_modified_data = {'d': 0, 'header': []}
 loaded_data = []
 removed_data = []
 header = None
@@ -17,11 +17,11 @@ score_data = dict()
 
 
 def load_data():
-    last_modified_date['d'] = os.path.getmtime(file_path)
+    last_modified_data['d'] = os.path.getmtime(file_path)
     del loaded_data[:]
     with open(file_path, 'rb') as csv_file:
         reader = csv.reader(csv_file)
-        header = reader.next()
+        last_modified_data['header'] = reader.next()
         for row in reader:
             if int(row[3]) > -1:
                 loaded_data.append(row)
@@ -31,7 +31,7 @@ def load_data():
 
 
 def refresh_data():
-    if os.path.getmtime(file_path) > last_modified_date['d']:
+    if os.path.getmtime(file_path) > last_modified_data['d']:
         load_data()
     threading.Timer(137, refresh_data).start()
 
@@ -46,6 +46,7 @@ def execute_update(final=False):
     if len(score_data):
         with open(file_path, 'wb') as csv_file:
             writer = csv.writer(csv_file)
+            writer.writerow(last_modified_data['header'])
             for row in loaded_data:
                 score = score_data.pop(row[1], 0)
                 row[3] = int(row[3]) + score
@@ -56,16 +57,33 @@ def execute_update(final=False):
                     row[3] = int(row[3]) + score
                     writer.writerow(row)
 
-        last_modified_date['d'] = os.path.getmtime(file_path)
+        last_modified_data['d'] = os.path.getmtime(file_path)
         loaded_data.sort(key=lambda x: (date_matcher.match(x[2]).group(), int(x[3])), reverse=True)
     if not final:
         threading.Timer(120, execute_update).start()
 
 
+def update_data_csv():
+    scraped_dat_file = "/home/pryrnjn/workspace/scrapper/data/instagram/instagram.csv"
+    url_set = set()
+    with open(file_path, "r") as csv_file:
+        reader = csv.reader(csv_file)
+        reader.next()
+        for row in reader:
+            url_set.add(row[1])
+    with open(scraped_dat_file, 'r') as input_file, open(file_path, 'a') as output_file:
+        reader = csv.reader(input_file)
+        writer = csv.writer(output_file)
+        reader.next()
+        for row in reader:
+            if row[1] not in url_set:
+                writer.writerow(row)
+
+
 def cleanup():
     execute_update(final=True)
 
-
+# update_data_csv()
 refresh_data()
 execute_update()
 
