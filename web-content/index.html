@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>Social Feed</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.5/angular.min.js">   </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.5/angular.min.js"></script>
     <script src="//platform.instagram.com/en_US/embeds.js"></script>
 </head>
 <body class="col-sm-offset-1 col-sm-10" style="padding-top: 2%;">
@@ -13,21 +13,21 @@
 </div>
 
 <div ng-app='myApplication' ng-controller='AppController'>
-  <div infinite-scroll='feed.nextPage()' infinite-scroll-disabled='feed.busy' infinite-scroll-distance='1'>
-    <div id="feed" style="margin-left: 140px;">
-        <div id={{url}} ng-repeat="url in feed.items">
-            <div class="content"></div>
-            <div class="buttons">
-                <button ng-click="updateScore(url, 100)">Superlike</button>
-                <button ng-click="updateScore(url, 10)">Upvote</button>
-                <button ng-click="updateScore(url, -10)">Downvote</button>
-                <button ng-click="updateScore(url, -100)">Bhakk</button>
+    <div infinite-scroll='feed.nextPage()' infinite-scroll-disabled='feed.busy' infinite-scroll-distance='1'>
+        <div id="feed" style="margin-left: 140px;">
+            <div id={{url}} ng-repeat="url in feed.items">
+                <div class="content"></div>
+                <div class="buttons">
+                    <button ng-click="updateScore(url, 100)">Superlike</button>
+                    <button ng-click="updateScore(url, 10)">Upvote</button>
+                    <button ng-click="updateScore(url, -10)">Downvote</button>
+                    <button ng-click="updateScore(url, -100)">Bhakk</button>
+                </div>
             </div>
         </div>
     </div>
-    </div>
     <div ng-show='feed.busy'>Loading data...</div>
-  </div>
+</div>
 </div>
 <!--https://material.angularjs.org/latest/demo/virtualRepeat-->
 <script>
@@ -93,19 +93,14 @@ angular.module('infinite-scroll', [])
 angular.module('myApplication', ['infinite-scroll']);
 
 angular.module('myApplication')
-  .controller('AppController', function($scope, InstaFeed){
+  .controller('AppController', function($scope, InstaFeed, $location){
       $scope.feed = new InstaFeed();
-      $scope.updateScore = function(url, score){
-        $http.get('/trending/update?url=url&score=score')
-            .then(function(data) {
-                console.log("update status "+ data.data.updated);
-            }.bind(this));
-      };
       $scope.updateScore = function(url, score) {
           $.get('/trending/update?url='+url+'&score='+score, function(resp){
             console.log("update status "+ resp.updated);
           });
-      }
+      };
+      console.log($location.absUrl());
     })
   .factory('InstaFeed', function($http) {
       var InstaFeed = function() {
@@ -155,6 +150,7 @@ angular.module('myApplication')
         return $sce.trustAsResourceUrl("http://api.instagram.com/oembed/?omitscript=true&url=" + url);
     };
 }]);
+
 
 </script>
 </body>

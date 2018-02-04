@@ -23,11 +23,12 @@ def load_data():
         reader = csv.reader(csv_file)
         last_modified_data['header'] = reader.next()
         for row in reader:
-            if int(row[3]) > -1:
+            if int(row[3]) > 0:
                 loaded_data.append(row)
             else:
                 removed_data.append(row)
-    loaded_data.sort(key=lambda x: (date_matcher.match(x[2]).group(), int(x[3])), reverse=True)
+    loaded_data.sort(key=lambda x: (int(x[3]), date_matcher.match(x[2]).group()), reverse=True)
+    print "refreshed in memory data from file"
 
 
 def refresh_data():
@@ -44,6 +45,7 @@ def update_score(url, score):
 
 def execute_update(final=False):
     if len(score_data):
+        print "writing updated score to file"
         with open(file_path, 'wb') as csv_file:
             writer = csv.writer(csv_file)
             writer.writerow(last_modified_data['header'])
@@ -64,6 +66,7 @@ def execute_update(final=False):
 
 
 def update_data_csv():
+    print "updating data from scrapped data"
     scraped_dat_file = "../scrapper/data/instagram/instagram.csv"
     url_set = set()
     with open(file_path, "r") as csv_file:
@@ -84,6 +87,7 @@ def update_data_csv():
 def cleanup():
     execute_update(final=True)
 
+
 update_data_csv()
 refresh_data()
 execute_update()
@@ -97,6 +101,7 @@ class TopTrendingController:
         query_arr = parse_qs(path_obj.query) or {}
         offset = int(query_arr.get("offset", [0])[0])
         limit = int(query_arr.get("limit", [20])[0])
+        sort_by = query_arr.get("sort", ["date"])[0]
         response = {}
         try:
             feed = loaded_data[offset:offset + limit]
