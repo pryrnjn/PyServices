@@ -64,7 +64,7 @@ def execute_update(final=False):
 
 
 def update_data_csv():
-    scraped_dat_file = "/home/ubuntu/scrapper/data/instagram/instagram.csv"
+    scraped_dat_file = "../scrapper/data/instagram/instagram.csv"
     url_set = set()
     with open(file_path, "r") as csv_file:
         reader = csv.reader(csv_file)
@@ -78,6 +78,7 @@ def update_data_csv():
         for row in reader:
             if row[1] not in url_set:
                 writer.writerow(row)
+                url_set.add(row[1])
 
 
 def cleanup():
