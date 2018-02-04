@@ -64,7 +64,7 @@ def execute_update(final=False):
 
 
 def update_data_csv():
-    scraped_dat_file = "/home/pryrnjn/workspace/scrapper/data/instagram/instagram.csv"
+    scraped_dat_file = "/home/ubuntu/scrapper/data/instagram/instagram.csv"
     url_set = set()
     with open(file_path, "r") as csv_file:
         reader = csv.reader(csv_file)
