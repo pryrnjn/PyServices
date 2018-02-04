@@ -53,11 +53,11 @@ def execute_update(final=False):
                 score = score_data.pop(row[1], 0)
                 row[3] = int(row[3]) + score
                 writer.writerow(row)
-            if score_data:
-                for row in removed_data:
-                    score = score_data.pop(row[1], 0)
-                    row[3] = int(row[3]) + score
-                    writer.writerow(row)
+
+            for row in removed_data:
+                score = score_data.pop(row[1], 0)
+                row[3] = int(row[3]) + score
+                writer.writerow(row)
 
         last_modified_data['d'] = os.path.getmtime(file_path)
         loaded_data.sort(key=lambda x: (date_matcher.match(x[2]).group(), int(x[3])), reverse=True)
