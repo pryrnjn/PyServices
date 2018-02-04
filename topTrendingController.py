@@ -83,7 +83,7 @@ def update_data_csv():
 def cleanup():
     execute_update(final=True)
 
-# update_data_csv()
+update_data_csv()
 refresh_data()
 execute_update()
 
