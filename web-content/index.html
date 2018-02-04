@@ -14,6 +14,9 @@
 
 <div ng-app='myApplication' ng-controller='AppController'>
     <div infinite-scroll='feed.nextPage()' infinite-scroll-disabled='feed.busy' infinite-scroll-distance='1'>
+        <div ng-repeat="value in [4, 4] track by value">
+            {{value}}
+        </div>
         <div id="feed" style="margin-left: 140px;">
             <div id={{url}} ng-repeat="url in feed.items">
                 <div class="content"></div>
@@ -119,22 +122,24 @@ angular.module('myApplication')
               var items = data.feed;
               for (var i = 0; i < items.length; i++) {
                 var mediaUrl = items[i][1];
-                this.items.push(mediaUrl);
-                $http.get("http://api.instagram.com/oembed/?omitscript=true&url="+mediaUrl)
-                    .then(function(resp) {
-                        if (resp.data && resp.data.html){
-                            var url = resp.config.url.replace(/.*&url=/, '')
-                            $('#feed').find("[id='" + url + "']").find("[class='content']").prepend($(resp.data.html));
-                            instgrm.Embeds.process();
-                        }
+                if (this.items.indexOf(mediaUrl) == -1){
+                    this.items.push(mediaUrl);
+                    $http.get("http://api.instagram.com/oembed/?omitscript=true&url="+mediaUrl)
+                        .then(function(resp) {
+                            if (resp.data && resp.data.html){
+                                var url = resp.config.url.replace(/.*&url=/, '')
+                                $('#feed').find("[id='" + url + "']").find("[class='content']").prepend($(resp.data.html));
+                                instgrm.Embeds.process();
+                            }
 
-                    }.bind(this), function(resp) {
-                        var url = resp.config.url.replace(/.*&url=/, '')
-                        var idx = this.items.indexOf(url);
-                        if (idx > -1)
-                            this.items.splice(idx, 1);
-                        this.notFoundItems.push(url);
-                    }.bind(this));
+                        }.bind(this), function(resp) {
+                            var url = resp.config.url.replace(/.*&url=/, '')
+                            var idx = this.items.indexOf(url);
+                            if (idx > -1)
+                                this.items.splice(idx, 1);
+                            this.notFoundItems.push(url);
+                        }.bind(this));
+                }
               }
               this.nextUrl = data.next || undefined;
             }.bind(this))
@@ -150,6 +155,8 @@ angular.module('myApplication')
         return $sce.trustAsResourceUrl("http://api.instagram.com/oembed/?omitscript=true&url=" + url);
     };
 }]);
+
+
 
 
 </script>
