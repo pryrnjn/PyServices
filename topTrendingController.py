@@ -11,7 +11,7 @@ from utils import *
 
 date_matcher = re.compile(r'\d{4}-\d{2}-\d{2}')
 file_path = "data/instagram/instagram.csv"
-scrapper_proj = "../scrapper/"
+scrapper_proj = "/home/ubuntu/scrapper/"
 last_modified_data = {'d': 0, 'header': []}
 loaded_data = []
 removed_data = []
