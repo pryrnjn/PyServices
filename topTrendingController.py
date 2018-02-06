@@ -11,8 +11,9 @@ from utils import *
 
 date_matcher = re.compile(r'\d{4}-\d{2}-\d{2}')
 file_path = "data/instagram/instagram.csv"
-scrapper_proj = "/home/ubuntu/scrapper/"
-last_modified_data = {'d': 0, 'header': []}
+scrapper_proj = "../scrapper/"
+scraped_data_file = scrapper_proj + "data/instagram/instagram.csv"
+last_modified_data = {'d': 0, 'header': [], 'scraped_date': 0}
 loaded_data = []
 removed_data = []
 header = None
@@ -35,6 +36,8 @@ def load_data():
 
 
 def refresh_data():
+    if os.path.getmtime(file_path) > last_modified_data['scraped_date']:
+        update_data_csv()
     if os.path.getmtime(file_path) > last_modified_data['d']:
         load_data()
     threading.Timer(137, refresh_data).start()
@@ -70,14 +73,14 @@ def execute_update(final=False):
 
 def update_data_csv():
     write_status("updating data from scrapped data")
-    scraped_dat_file = scrapper_proj + "data/instagram/instagram.csv"
     url_set = set()
+    last_modified_data['scraped_date'] = os.path.getmtime(scraped_data_file)
     with open(file_path, "r") as csv_file:
         reader = csv.reader(csv_file)
         reader.next()
         for row in reader:
             url_set.add(row[1])
-    with open(scraped_dat_file, 'r') as input_file, open(file_path, 'a') as output_file:
+    with open(scraped_data_file, 'r') as input_file, open(file_path, 'a') as output_file:
         reader = csv.reader(input_file)
         writer = csv.writer(output_file)
         reader.next()
@@ -90,8 +93,11 @@ def update_data_csv():
 def run_scrapper():
     try:
         write_status("attempting start scrapper")
-        status = subprocess.check_call([scrapper_proj + "bin/run_scrapy.sh", "instagram", "instagram.csv", "csv",
-                                        scrapper_proj + "bin/scrapy.properties"])
+        if time.time() - os.path.getmtime(scraped_data_file) > 3600:
+            status = subprocess.check_call([scrapper_proj + "bin/run_scrapy.sh", "instagram", "instagram.csv", "csv",
+                                            scrapper_proj + "bin/scrapy.properties"])
+        else:
+            write_status("recently run, skipping!")
         update_data_csv()
         write_status("updated data csv from scrapped content")
         threading.Timer(14400, run_scrapper).start()
@@ -104,17 +110,17 @@ def run_scrapper():
 
 def write_status(msg):
     with open("data/instagram/scrapper_status.txt", 'a') as status_file:
-        status_file.write("[%s] - %s\n" % (time.strftime("%Y-%h-%d %H:%M:%S %Z"), str(msg)))
+        status_file.write(
+            "[%s IST] - %s\n" % (time.strftime("%Y-%h-%d %H:%M:%S", time.gmtime(time.time() + 19800)), str(msg)))
 
 
 def cleanup():
     execute_update(final=True)
 
 
-update_data_csv()
 refresh_data()
 execute_update()
-threading.Timer(0, run_scrapper).start()
+# threading.Timer(0, run_scrapper).start() # handled by crontab
 
 
 class TopTrendingController:
