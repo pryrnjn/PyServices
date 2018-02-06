@@ -36,7 +36,7 @@ def load_data():
 
 
 def refresh_data():
-    if os.path.getmtime(file_path) > last_modified_data['scraped_date']:
+    if os.path.getmtime(scraped_data_file) > last_modified_data['scraped_date']:
         update_data_csv()
     if os.path.getmtime(file_path) > last_modified_data['d']:
         load_data()
