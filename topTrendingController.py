@@ -1,7 +1,9 @@
 import csv
 import os
 import re
+import subprocess
 import threading
+import time
 import traceback
 from urlparse import parse_qs
 
@@ -9,6 +11,7 @@ from utils import *
 
 date_matcher = re.compile(r'\d{4}-\d{2}-\d{2}')
 file_path = "data/instagram/instagram.csv"
+scrapper_proj = "/home/pryrnjn/workspace/scrapper/"
 last_modified_data = {'d': 0, 'header': []}
 loaded_data = []
 removed_data = []
@@ -28,7 +31,7 @@ def load_data():
             else:
                 removed_data.append(row)
     loaded_data.sort(key=lambda x: (int(x[3]), date_matcher.match(x[2]).group()), reverse=True)
-    print "refreshed in memory data from file"
+    write_status("refreshed in memory data from file")
 
 
 def refresh_data():
@@ -45,7 +48,7 @@ def update_score(url, score):
 
 def execute_update(final=False):
     if len(score_data):
-        print "writing updated score to file"
+        write_status("writing updated score to file")
         with open(file_path, 'wb') as csv_file:
             writer = csv.writer(csv_file)
             writer.writerow(last_modified_data['header'])
@@ -66,8 +69,8 @@ def execute_update(final=False):
 
 
 def update_data_csv():
-    print "updating data from scrapped data"
-    scraped_dat_file = "../scrapper/data/instagram/instagram.csv"
+    write_status("updating data from scrapped data")
+    scraped_dat_file = scrapper_proj + "data/instagram/instagram.csv"
     url_set = set()
     with open(file_path, "r") as csv_file:
         reader = csv.reader(csv_file)
@@ -84,6 +87,26 @@ def update_data_csv():
                 url_set.add(row[1])
 
 
+def run_scrapper():
+    try:
+        write_status("attempting start scrapper")
+        status = subprocess.check_call([scrapper_proj + "bin/run_scrapy.sh", "instagram", "instagram.csv", "csv",
+                                        scrapper_proj + "bin/scrapy.properties"])
+        update_data_csv()
+        write_status("updated data csv from scrapped content")
+        threading.Timer(14400, run_scrapper).start()
+    except subprocess.CalledProcessError as e:
+        status = e.returncode
+        threading.Timer(3600, run_scrapper).start()
+    finally:
+        write_status("completed scrapper with status %d" % status)
+
+
+def write_status(msg):
+    with open("data/instagram/scrapper_status.txt", 'a') as status_file:
+        status_file.write("[%s] - %s\n" % (time.strftime("%Y-%h-%d %H:%M:%S %Z"), str(msg)))
+
+
 def cleanup():
     execute_update(final=True)
 
@@ -91,6 +114,7 @@ def cleanup():
 update_data_csv()
 refresh_data()
 execute_update()
+threading.Timer(0, run_scrapper).start()
 
 
 class TopTrendingController:

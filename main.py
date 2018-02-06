@@ -22,6 +22,15 @@ class MainController(BaseHTTPRequestHandler):
         elif path_obj.path.find("/trending") == 0:
             from topTrendingController import TopTrendingController
             TopTrendingController(self).do_GET(path_obj)
+        elif path_obj.path.find("/status") == 0:
+            self.send_response(200)
+            self.send_header('Content-type', 'text/html')
+            self.end_headers()
+            try:
+                self.wfile.write(open(os.path.join(this_dir, "data", "instagram", "scrapper_status.txt"), 'r').read())
+            except:
+                traceback.print_exc()
+                self.wfile.write("Something Wrong!")
         else:
             self.send_response(200)
             self.send_header('Content-type', 'text/html')
