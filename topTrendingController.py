@@ -31,7 +31,7 @@ def load_data():
                 loaded_data.append(row)
             else:
                 removed_data.append(row)
-    loaded_data.sort(key=lambda x: (int(x[3]), date_matcher.match(x[2]).group()), reverse=True)
+    loaded_data.sort(key=lambda x: (date_matcher.match(x[2]).group(), int(x[3])), reverse=True)
     write_status("refreshed in memory data from file")
 
 
@@ -128,6 +128,7 @@ class TopTrendingController:
         self.server = server
 
     def do_GET(self, path_obj=None):
+	write_status(self.server.headers.get('Host'))
         query_arr = parse_qs(path_obj.query) or {}
         offset = int(query_arr.get("offset", [0])[0])
         limit = int(query_arr.get("limit", [20])[0])
