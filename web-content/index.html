@@ -105,6 +105,7 @@ angular.module('myApplication')
   .factory('InstaFeed', function($http, $sce) {
       var InstaFeed = function() {
         this.items = [];
+        this.set = new Set();
         this.busy = false;
         this.inProgress = 0;
         this.progressStarted = function(){
@@ -128,7 +129,8 @@ angular.module('myApplication')
               var items = data.feed;
               for (var i = 0; i < items.length; i++) {
                 var mediaUrl = items[i][1];
-                if (this.items.indexOf(mediaUrl) == -1){
+                if (!this.set.has(mediaUrl)){
+                    this.set.add(mediaUrl);
                     if (this.items.length > 15) this.items.shift();
                     this.items.push(mediaUrl);
                     this.progressStarted();
