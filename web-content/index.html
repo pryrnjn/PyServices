@@ -13,7 +13,7 @@
 </div>
 
 <div ng-app='myApplication' ng-controller='AppController'>
-    <div infinite-scroll='feed.nextPage()' infinite-scroll-disabled='feed.busy' infinite-scroll-distance='1'>
+    <div infinite-scroll='feed.nextPage()' infinite-scroll-disabled='feed.busy()' infinite-scroll-distance='1'>
         <div id="feed" style="margin-left: 140px;">
             <div id={{url}} ng-repeat="url in feed.items">
                 <div class="content"></div>
@@ -101,7 +101,6 @@ angular.module('myApplication')
           });
       };
       //console.log($location.absUrl());
-      $scope.feed.nextPage();
     })
   .factory('InstaFeed', function($http, $sce) {
       var InstaFeed = function() {
