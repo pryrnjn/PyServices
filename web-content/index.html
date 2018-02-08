@@ -137,7 +137,7 @@ angular.module('myApplication')
                             if (resp.data && resp.data.html){
                                 var url = resp.config.url.toString().replace(/.*&url=/, '')
                                 if (this.items.length > 15) this.items.shift();
-                                this.items.push(mediaUrl);
+                                this.items.push(url);
                                 $('#feed').find("[id='" + url + "']").find("[class='content']").prepend($(resp.data.html));
                                 instgrm.Embeds.process();
                             }
