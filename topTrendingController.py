@@ -19,6 +19,7 @@ loaded_data = []
 removed_data = []
 header = None
 score_data = dict()
+visitors = list()
 
 
 def load_data():
@@ -42,7 +43,7 @@ def refresh_data():
         update_data_csv()
     if os.path.getmtime(file_path) > last_modified_data['d']:
         load_data()
-    threading.Timer(137, refresh_data).start()
+    threading.Timer(1800, refresh_data).start()
 
 
 def update_score(url, score):
@@ -52,6 +53,11 @@ def update_score(url, score):
 
 
 def execute_update(final=False):
+    if len(visitors):
+        with open("data/instagram/visitors.csv", 'a') as csv_file:
+            writer = csv.writer(csv_file)
+            for visitor in visitors:
+                writer.writerow(visitor)
     if len(score_data):
         write_status("writing updated score to file")
         with open(file_path, 'wb') as csv_file:
@@ -132,7 +138,9 @@ class TopTrendingController:
         self.server = server
 
     def do_GET(self, path_obj=None):
-        write_status(self.server.headers.get('Host'))
+        visitors.append([self.server.headers.get('Host'),
+                         self.server.client_address[0],
+                         time.strftime("%Y-%h-%d-%H-%M", time.gmtime(time.time() + 19800))])
         query_arr = parse_qs(path_obj.query) or {}
         offset = int(query_arr.get("offset", [0])[0])
         limit = int(query_arr.get("limit", [20])[0])
