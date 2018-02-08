@@ -131,22 +131,22 @@ angular.module('myApplication')
                 var mediaUrl = items[i][1];
                 if (!this.set.has(mediaUrl)){
                     this.set.add(mediaUrl);
+                    if (this.items.length > 15) this.items.shift();
+                    this.items.push(mediaUrl);
                     this.progressStarted();
                     $http.jsonp($sce.trustAsResourceUrl("http://api.instagram.com/oembed/?omitscript=true&url=" + mediaUrl))
                         .then(function(resp) {
                             if (resp.data && resp.data.html){
                                 var url = resp.config.url.toString().replace(/.*&url=/, '')
-                                if (this.items.length > 15) this.items.shift();
-                                this.items.push(url);
                                 $('#feed').find("[id='" + url + "']").find("[class='content']").prepend($(resp.data.html));
                                 instgrm.Embeds.process();
                             }
 
                         }.bind(this), function(resp) {
                             var url = resp.config.url.toString().replace(/.*&url=/, '')
-                            //var idx = this.items.indexOf(url);
-                            //if (idx > -1)
-                            //    this.items.splice(idx, 1);
+                            var idx = this.items.indexOf(url);
+                            if (idx > -1)
+                                this.items.splice(idx, 1);
                             this.notFoundItems.push(url);
                         }.bind(this))
                         .finally(function(){
