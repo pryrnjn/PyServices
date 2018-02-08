@@ -129,6 +129,7 @@ angular.module('myApplication')
               for (var i = 0; i < items.length; i++) {
                 var mediaUrl = items[i][1];
                 if (this.items.indexOf(mediaUrl) == -1){
+                    if (this.items.length > 15) this.items.shift();
                     this.items.push(mediaUrl);
                     this.progressStarted();
                     $http.jsonp($sce.trustAsResourceUrl("http://api.instagram.com/oembed/?omitscript=true&url=" + mediaUrl))

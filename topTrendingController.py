@@ -58,6 +58,7 @@ def execute_update(final=False):
             writer = csv.writer(csv_file)
             for visitor in visitors:
                 writer.writerow(visitor)
+            del visitors[:]
     if len(score_data):
         write_status("writing updated score to file")
         with open(file_path, 'wb') as csv_file:
