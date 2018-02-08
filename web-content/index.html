@@ -120,7 +120,7 @@ angular.module('myApplication')
 
       InstaFeed.prototype.nextPage = function() {
         if (this.busy || !this.nextUrl) return;
-        this.inProgress++;
+        this.progressStarted();
         $http.get(this.nextUrl)
             .then(function(data) {
               data = data.data;
@@ -129,7 +129,7 @@ angular.module('myApplication')
                 var mediaUrl = items[i][1];
                 if (this.items.indexOf(mediaUrl) == -1){
                     this.items.push(mediaUrl);
-                    this.inProgress++;
+                    this.progressStarted();
                     $http.jsonp($sce.trustAsResourceUrl("http://api.instagram.com/oembed/?omitscript=true&url=" + mediaUrl))
                         .then(function(resp) {
                             if (resp.data && resp.data.html){
@@ -146,14 +146,14 @@ angular.module('myApplication')
                             this.notFoundItems.push(url);
                         }.bind(this))
                         .finally(function(){
-                            this.inProgress--;
+                            this.progressCompleted();
                         }.bind(this));
                 }
               }
               this.nextUrl = data.next || undefined;
             }.bind(this))
             .finally(function(){
-              this.inProgress--;;
+                this.progressCompleted();
             }.bind(this));
       };
 
