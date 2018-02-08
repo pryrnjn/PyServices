@@ -135,9 +135,9 @@ angular.module('myApplication')
                     $http.jsonp($sce.trustAsResourceUrl("http://api.instagram.com/oembed/?omitscript=true&url=" + mediaUrl))
                         .then(function(resp) {
                             if (resp.data && resp.data.html){
+                                var url = resp.config.url.toString().replace(/.*&url=/, '')
                                 if (this.items.length > 15) this.items.shift();
                                 this.items.push(mediaUrl);
-                                var url = resp.config.url.toString().replace(/.*&url=/, '')
                                 $('#feed').find("[id='" + url + "']").find("[class='content']").prepend($(resp.data.html));
                                 instgrm.Embeds.process();
                             }
