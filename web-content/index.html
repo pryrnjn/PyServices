@@ -26,7 +26,7 @@
             </div>
         </div>
     </div>
-    <div ng-show='feed.busy'>Loading data...</div>
+    <!--<div ng-show='feed.busy()'>Loading data...</div>-->
 </div>
 </div>
 <!--https://material.angularjs.org/latest/demo/virtualRepeat-->
@@ -100,14 +100,15 @@ angular.module('myApplication')
             console.log("update status "+ resp.updated);
           });
       };
-      console.log($location.absUrl());
+      //console.log($location.absUrl());
+      $scope.feed.nextPage();
     })
   .factory('InstaFeed', function($http, $sce) {
       var InstaFeed = function() {
         this.items = [];
         this.inProgress = 0;
         this.busy = function(){
-            return this.inProgress === 0;
+            return this.inProgress > 0;
         }.bind(this);
         this.nextUrl = "/trending?limit=5";
         this.notFoundItems = [];
