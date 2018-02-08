@@ -13,7 +13,7 @@
 </div>
 
 <div ng-app='myApplication' ng-controller='AppController'>
-    <div infinite-scroll='feed.nextPage()' infinite-scroll-disabled='feed.busy()' infinite-scroll-distance='1'>
+    <div infinite-scroll='feed.nextPage()' infinite-scroll-disabled='feed.busy' infinite-scroll-distance='1'>
         <div id="feed" style="margin-left: 140px;">
             <div id={{url}} ng-repeat="url in feed.items">
                 <div class="content"></div>
@@ -26,7 +26,7 @@
             </div>
         </div>
     </div>
-    <!--<div ng-show='feed.busy()'>Loading data...</div>-->
+    <div ng-show='feed.busy'>Loading data...</div>
 </div>
 </div>
 <!--https://material.angularjs.org/latest/demo/virtualRepeat-->
@@ -105,16 +105,21 @@ angular.module('myApplication')
   .factory('InstaFeed', function($http, $sce) {
       var InstaFeed = function() {
         this.items = [];
+        this.busy = false;
         this.inProgress = 0;
-        this.busy = function(){
-            return this.inProgress > 0;
-        }.bind(this);
+        this.progressStarted = function(){
+            this.inProgress++;
+        };
+        this.progressCompleted = function(){
+            this.inProgress--;
+            this.busy = this.inProgress > 0;
+        };
         this.nextUrl = "/trending?limit=5";
         this.notFoundItems = [];
       };
 
       InstaFeed.prototype.nextPage = function() {
-        if (this.busy() || !this.nextUrl) return;
+        if (this.busy || !this.nextUrl) return;
         this.inProgress++;
         $http.get(this.nextUrl)
             .then(function(data) {
