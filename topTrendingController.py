@@ -1,5 +1,6 @@
 import csv
 import os
+import random
 import re
 import subprocess
 import threading
@@ -13,7 +14,7 @@ date_matcher = re.compile(r'\d{4}-\d{2}-\d{2}')
 file_path = "data/instagram/instagram.csv"
 scrapper_proj = "../scrapper/"
 scraped_data_file = scrapper_proj + "data/instagram/instagram.csv"
-last_modified_data = {'d': 0, 'header': [], 'scraped_date': 0}
+last_modified_data = {'d': 0, 'header': [], 'scraped_date': 0, 'len': 0}
 loaded_data = []
 removed_data = []
 header = None
@@ -31,7 +32,8 @@ def load_data():
                 loaded_data.append(row)
             else:
                 removed_data.append(row)
-    loaded_data.sort(key=lambda x: (date_matcher.match(x[2]).group(), int(x[3])), reverse=True)
+    # loaded_data.sort(key=lambda x: (date_matcher.match(x[2]).group(), int(x[3])), reverse=True)
+    last_modified_data['len'] = len(loaded_data)
     write_status("refreshed in memory data from file")
 
 
@@ -120,6 +122,8 @@ def cleanup():
 
 refresh_data()
 execute_update()
+
+
 # threading.Timer(0, run_scrapper).start() # handled by crontab
 
 
@@ -128,7 +132,7 @@ class TopTrendingController:
         self.server = server
 
     def do_GET(self, path_obj=None):
-	write_status(self.server.headers.get('Host'))
+        write_status(self.server.headers.get('Host'))
         query_arr = parse_qs(path_obj.query) or {}
         offset = int(query_arr.get("offset", [0])[0])
         limit = int(query_arr.get("limit", [20])[0])
@@ -136,9 +140,10 @@ class TopTrendingController:
         response = {}
         try:
             feed = loaded_data[offset:offset + limit]
-            response["feed"] = feed
-            if len(feed) == limit:
-                response["next"] = "/trending?offset=%d&limit=%d" % (offset + len(feed), limit)
+            indices = random.sample(xrange(last_modified_data['len']), 5)
+            response["feed"] = [loaded_data[i] for i in indices]
+            # if len(feed) == limit:
+            response["next"] = "/trending?offset=%d&limit=%d" % (offset + len(feed), limit)
             response = build_json_response(response)
         except:
             self.server.send_error(500, "We couldn't serve you! We're working on this..")
