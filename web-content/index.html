@@ -105,14 +105,17 @@ angular.module('myApplication')
   .factory('InstaFeed', function($http, $sce) {
       var InstaFeed = function() {
         this.items = [];
-        this.busy = false;
+        this.inProgress = 0;
+        this.busy = function(){
+            return this.inProgress === 0;
+        }.bind(this);
         this.nextUrl = "/trending?limit=5";
         this.notFoundItems = [];
       };
 
       InstaFeed.prototype.nextPage = function() {
-        if (this.busy || !this.nextUrl) return;
-        this.busy = true;
+        if (this.busy() || !this.nextUrl) return;
+        this.inProgress++;
         $http.get(this.nextUrl)
             .then(function(data) {
               data = data.data;
@@ -121,8 +124,9 @@ angular.module('myApplication')
                 var mediaUrl = items[i][1];
                 if (this.items.indexOf(mediaUrl) == -1){
                     this.items.push(mediaUrl);
+                    this.inProgress++;
                     $http.jsonp($sce.trustAsResourceUrl("http://api.instagram.com/oembed/?omitscript=true&url=" + mediaUrl))
-                        .then(function(resp, a, b) {
+                        .then(function(resp) {
                             if (resp.data && resp.data.html){
                                 var url = resp.config.url.toString().replace(/.*&url=/, '')
                                 $('#feed').find("[id='" + url + "']").find("[class='content']").prepend($(resp.data.html));
@@ -135,13 +139,16 @@ angular.module('myApplication')
                             if (idx > -1)
                                 this.items.splice(idx, 1);
                             this.notFoundItems.push(url);
+                        }.bind(this))
+                        .finally(function(){
+                            this.inProgress--;
                         }.bind(this));
                 }
               }
               this.nextUrl = data.next || undefined;
             }.bind(this))
             .finally(function(){
-              this.busy = false;
+              this.inProgress--;;
             }.bind(this));
       };
 
