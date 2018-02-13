@@ -33,3 +33,50 @@
 [2018-Feb-09 02:30:57 IST] - writing updated score to file
 [2018-Feb-09 02:32:57 IST] - writing updated score to file
 [2018-Feb-09 02:34:57 IST] - writing updated score to file
+[2018-Feb-09 02:44:18 IST] - updating data from scrapped data
+[2018-Feb-09 02:44:18 IST] - refreshed in memory data from file
+[2018-Feb-09 03:44:18 IST] - updating data from scrapped data
+[2018-Feb-09 06:44:18 IST] - updating data from scrapped data
+[2018-Feb-09 06:44:18 IST] - refreshed in memory data from file
+[2018-Feb-09 08:16:18 IST] - writing updated score to file
+[2018-Feb-09 08:18:18 IST] - writing updated score to file
+[2018-Feb-09 08:20:18 IST] - writing updated score to file
+[2018-Feb-09 08:28:18 IST] - writing updated score to file
+[2018-Feb-09 08:30:18 IST] - writing updated score to file
+[2018-Feb-09 08:32:18 IST] - writing updated score to file
+[2018-Feb-09 08:36:18 IST] - writing updated score to file
+[2018-Feb-09 09:44:18 IST] - updating data from scrapped data
+[2018-Feb-09 09:44:18 IST] - refreshed in memory data from file
+[2018-Feb-09 12:44:18 IST] - updating data from scrapped data
+[2018-Feb-09 12:44:18 IST] - refreshed in memory data from file
+[2018-Feb-09 15:44:18 IST] - updating data from scrapped data
+[2018-Feb-09 18:35:43 IST] - updating data from scrapped data
+[2018-Feb-09 18:35:43 IST] - refreshed in memory data from file
+[2018-Feb-09 21:35:43 IST] - updating data from scrapped data
+[2018-Feb-10 00:35:43 IST] - updating data from scrapped data
+[2018-Feb-10 00:35:43 IST] - refreshed in memory data from file
+[2018-Feb-10 03:35:43 IST] - updating data from scrapped data
+[2018-Feb-10 05:19:43 IST] - writing updated score to file
+[2018-Feb-10 06:35:43 IST] - updating data from scrapped data
+[2018-Feb-10 06:35:43 IST] - refreshed in memory data from file
+[2018-Feb-10 10:06:06 IST] - updating data from scrapped data
+[2018-Feb-10 12:36:06 IST] - updating data from scrapped data
+[2018-Feb-10 16:37:21 IST] - updating data from scrapped data
+[2018-Feb-10 19:08:00 IST] - updating data from scrapped data
+[2018-Feb-10 22:08:39 IST] - updating data from scrapped data
+[2018-Feb-11 13:08:59 IST] - updating data from scrapped data
+[2018-Feb-12 13:09:51 IST] - updating data from scrapped data
+[2018-Feb-12 13:28:23 IST] - updating data from scrapped data
+[2018-Feb-12 13:28:23 IST] - refreshed in memory data from file
+[2018-Feb-12 18:35:24 IST] - writing updated score to file
+[2018-Feb-12 18:37:25 IST] - writing updated score to file
+[2018-Feb-12 21:59:29 IST] - writing updated score to file
+[2018-Feb-12 22:01:29 IST] - writing updated score to file
+[2018-Feb-12 22:03:30 IST] - writing updated score to file
+[2018-Feb-12 22:05:30 IST] - writing updated score to file
+[2018-Feb-12 22:25:30 IST] - writing updated score to file
+[2018-Feb-12 22:27:30 IST] - writing updated score to file
+[2018-Feb-12 22:29:30 IST] - writing updated score to file
+[2018-Feb-13 06:58:47 IST] - updating data from scrapped data
+[2018-Feb-13 14:06:52 IST] - updating data from scrapped data
+[2018-Feb-13 14:06:52 IST] - refreshed in memory data from file
