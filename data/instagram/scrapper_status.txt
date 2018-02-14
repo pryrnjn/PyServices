@@ -89,3 +89,12 @@
 [2018-Feb-13 15:02:52 IST] - writing updated score to file
 [2018-Feb-13 15:36:53 IST] - updating data from scrapped data
 [2018-Feb-13 22:37:54 IST] - writing updated score to file
+[2018-Feb-14 10:07:01 IST] - updating data from scrapped data
+[2018-Feb-14 10:07:01 IST] - refreshed in memory data from file
+[2018-Feb-14 10:11:01 IST] - writing updated score to file
+[2018-Feb-14 10:16:08 IST] - updating data from scrapped data
+[2018-Feb-14 10:16:08 IST] - refreshed in memory data from file
+[2018-Feb-14 10:22:08 IST] - writing updated score to file
+[2018-Feb-14 12:46:08 IST] - updating data from scrapped data
+[2018-Feb-14 13:46:08 IST] - updating data from scrapped data
+[2018-Feb-14 13:46:08 IST] - refreshed in memory data from file
