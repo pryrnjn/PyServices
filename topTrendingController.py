@@ -16,6 +16,7 @@ scrapper_proj = "../scrapper/"
 scraped_data_file = scrapper_proj + "data/instagram/instagram.csv"
 last_modified_data = {'d': 0, 'header': [], 'scraped_date': 0, 'len': 0}
 loaded_data = []
+high_rated_data = []
 removed_data = []
 header = None
 score_data = dict()
@@ -25,15 +26,18 @@ visitors = list()
 def load_data():
     last_modified_data['d'] = os.path.getmtime(file_path)
     del loaded_data[:]
+    del high_rated_data[:]
     with open(file_path, 'rb') as csv_file:
         reader = csv.reader(csv_file)
         last_modified_data['header'] = reader.next()
         for row in reader:
             if int(row[3]) > 0:
                 loaded_data.append(row)
+                if int(row[3]) > 40:
+                    high_rated_data.append(row)
             else:
                 removed_data.append(row)
-    # loaded_data.sort(key=lambda x: (date_matcher.match(x[2]).group(), int(x[3])), reverse=True)
+    loaded_data.sort(key=lambda x: (date_matcher.match(x[2]).group(), int(x[3])), reverse=True)
     last_modified_data['len'] = len(loaded_data)
     write_status("refreshed in memory data from file")
 
@@ -145,14 +149,20 @@ class TopTrendingController:
         query_arr = parse_qs(path_obj.query) or {}
         offset = int(query_arr.get("offset", [0])[0])
         limit = int(query_arr.get("limit", [20])[0])
-        sort_by = query_arr.get("sort", ["date"])[0]
+        sort_by = query_arr.get("sort", [""])[0]
         response = {}
         try:
             feed = loaded_data[offset:offset + limit]
-            indices = random.sample(xrange(last_modified_data['len']), 5)
-            response["feed"] = [loaded_data[i] for i in indices]
+            if sort_by == "date":
+                response["feed"] = loaded_data[offset:offset + limit]
+            elif sort_by == "score":
+                indices = random.sample(xrange(len(high_rated_data)), 5)
+                response["feed"] = [high_rated_data[i] for i in indices]
+            else:
+                indices = random.sample(xrange(last_modified_data['len']), 5)
+                response["feed"] = [loaded_data[i] for i in indices]
             # if len(feed) == limit:
-            response["next"] = "/trending?offset=%d&limit=%d" % (offset + len(feed), limit)
+            response["next"] = "/trending?offset=%d&limit=%d&sort=%s" % (offset + len(feed), limit, sort_by)
             response = build_json_response(response)
         except:
             self.server.send_error(500, "We couldn't serve you! We're working on this..")

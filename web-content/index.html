@@ -3,16 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <title>Social Feed</title>
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/angular-material/1.1.7/angular-material.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.5/angular.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.9/angular.min.js"></script>
     <script src="//platform.instagram.com/en_US/embeds.js"></script>
+
+    <!-- Angular Material pre-requisite Libraries -->
+    <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.9/angular-animate.min.js"></script>-->
+    <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.9/angular-aria.min.js"></script>-->
+    <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.9/angular-messages.min.js"></script>-->
+
+    <!-- Angular Material Library -->
+    <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/angular-material/1.1.7/angular-material.min.js"></script>-->
+    <style>
+        /* Style the tab */
+        .tab {
+            overflow: hidden;
+            border: 1px solid #ccc;
+            background-color: #f1f1f1;
+        }
+
+        /* Style the buttons that are used to open the tab content */
+        .tab button {
+            background-color: inherit;
+            float: left;
+            border: 1px solid #ccc;
+            outline: none;
+            cursor: pointer;
+            padding: 14px 16px;
+            transition: 0.3s;
+        }
+
+        /* Change background color of buttons on hover */
+        .tab button:hover {
+            background-color: #ddd;
+        }
+
+        /* Create an active/current tablink class */
+        .tab button.active {
+            background-color: #ccc;
+        }
+
+        /* Style the tab content */
+        .tabcontent {
+            display: none;
+            padding: 6px 12px;
+            border: 1px solid #ccc;
+            border-top: none;
+        }
+
+    </style>
 </head>
-<body class="col-sm-offset-1 col-sm-10" style="padding-top: 2%;">
-<div style="margin-left: 140px;">
-    <h3>Top Models from Instagram</h3>
-</div>
+<body class="col-sm-offset-1 col-sm-10">
 
 <div ng-app='myApplication' ng-controller='AppController'>
+    <div class="tab" style="z-index: 2; position: fixed; width: 100%;">
+        <button class="tablinks"
+                ng-class="{'active': selectedTab.index == tab.index}"
+                ng-click="onClickTab(tab)" ng-repeat="tab in tabs">{{tab.label}}</button>
+    </div>
+
+
+    <div style="margin-left: 140px; padding-top: 40px;">
+        <h3>Top Models from Instagram</h3>
+    </div>
     <div infinite-scroll='feed.nextPage()' infinite-scroll-disabled='feed.busy' infinite-scroll-distance='1'>
         <div id="feed" style="margin-left: 140px;">
             <div id={{url}} ng-repeat="url in feed.items">
@@ -31,6 +86,7 @@
 </div>
 <!--https://material.angularjs.org/latest/demo/virtualRepeat-->
 <script>
+
 /* ng-infinite-scroll - v1.0.0 - 2013-02-23 */
 angular.module('infinite-scroll', [])
 .directive('infiniteScroll', [
@@ -94,20 +150,30 @@ angular.module('myApplication', ['infinite-scroll']);
 
 angular.module('myApplication')
   .controller('AppController', function($scope, InstaFeed, $location){
-      $scope.feed = new InstaFeed();
       $scope.updateScore = function(url, score) {
           $.get('/trending/update?url='+url+'&score='+score, function(resp){
             console.log("update status "+ resp.updated);
           });
       };
+      $scope.tabs = [{"index": 1, "label": "Trending Instagram", "sortBy":""},
+                        {"index": 2, "label": "Recent", "sortBy":"date"},
+                       {"index": 3, "label": "Best of All times", "sortBy":"score"}]
       //console.log($location.absUrl());
+      $scope.onClickTab = function(tab) {
+        $scope.selectedTab = tab;
+        $scope.feed = new InstaFeed(tab.sortBy);
+        $scope.feed.nextPage();
+      };
+
+      $scope.onClickTab($scope.tabs[0])
     })
   .factory('InstaFeed', function($http, $sce) {
-      var InstaFeed = function() {
+      var InstaFeed = function(sortBy) {
         this.items = [];
         this.set = new Set();
         this.busy = false;
         this.inProgress = 0;
+        this.sortBy = sortBy;
         this.progressStarted = function(){
             this.inProgress++;
             this.busy = this.inProgress > 0;
@@ -116,7 +182,7 @@ angular.module('myApplication')
             this.inProgress--;
             this.busy = this.inProgress > 0;
         };
-        this.nextUrl = "/trending?limit=5";
+        this.nextUrl = "/trending?limit=5&sort=" + this.sortBy;
         this.notFoundItems = [];
       };
 
@@ -133,7 +199,7 @@ angular.module('myApplication')
                     this.set.add(mediaUrl);
                     if (this.items.length > 15) this.items.shift();
                     this.items.push(mediaUrl);
-                    this.progressStarted();
+                        this.progressStarted();
                     $http.jsonp($sce.trustAsResourceUrl("http://api.instagram.com/oembed/?omitscript=true&url=" + mediaUrl))
                         .then(function(resp) {
                             if (resp.data && resp.data.html){
@@ -168,6 +234,12 @@ angular.module('myApplication')
         return $sce.trustAsResourceUrl("http://api.instagram.com/oembed/?omitscript=true&url=" + url);
     };
 }]);
+
+
+
+
+
+
 
 
 
