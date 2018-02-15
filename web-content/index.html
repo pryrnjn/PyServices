@@ -18,15 +18,19 @@
     <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/angular-material/1.1.7/angular-material.min.js"></script>-->
     <style>
         /* Style the tab */
+        .action {
+            padding: 12px;
+            margin: -12px 4px 12px 0px;
+        }
         .tab {
             overflow: hidden;
             border: 1px solid #ccc;
-            background-color: #000000;
+            background-color: #f1f1f1;
         }
 
         /* Style the buttons that are used to open the tab content */
         .tab button {
-            background-color: #f1f1f1;
+            background-color: inherit;
             float: left;
             border: 1px solid #ccc;
             outline: none;
@@ -73,10 +77,10 @@
             <div id={{url}} ng-repeat="url in feed.items">
                 <div class="content"></div>
                 <div class="buttons">
-                    <button ng-click="updateScore(url, 100)">Superlike</button>
-                    <button ng-click="updateScore(url, 10)">Upvote</button>
-                    <button ng-click="updateScore(url, -10)">Downvote</button>
-                    <button ng-click="updateScore(url, -100)">Bhakk</button>
+                    <button class="action" ng-click="updateScore(url, 100, $event)">Superlike</button>
+                    <button class="action" ng-click="updateScore(url, 10, $event)">Upvote</button>
+                    <button class="action" ng-click="updateScore(url, -10, $event)">Downvote</button>
+                    <button class="action" ng-click="updateScore(url, -100, $event)">Bhakk</button>
                 </div>
             </div>
         </div>
@@ -150,10 +154,11 @@ angular.module('myApplication', ['infinite-scroll']);
 
 angular.module('myApplication')
   .controller('AppController', function($scope, InstaFeed, $location){
-      $scope.updateScore = function(url, score) {
+      $scope.updateScore = function(url, score, $event) {
           $.get('/trending/update?url='+url+'&score='+score, function(resp){
             console.log("update status "+ resp.updated);
-          });
+            this.textContent += (this.textContent.endsWith('e')) ? 'd!' : 'ed!';
+          }.bind($event.currentTarget));
       };
       $scope.tabs = [{"index": 1, "label": "Trending Instagram", "sortBy":""},
                         {"index": 2, "label": "Recent", "sortBy":"date"},
