@@ -157,7 +157,10 @@ angular.module('myApplication')
       $scope.updateScore = function(url, score, $event) {
           $.get('/trending/update?url='+url+'&score='+score, function(resp){
             console.log("update status "+ resp.updated);
-            this.textContent += (this.textContent.endsWith('e')) ? 'd!' : 'ed!';
+            if (this.textContent.endsWith('!'))
+                this.textContent += '!'
+            else
+                this.textContent += (this.textContent.endsWith('e')) ? 'd!' : 'ed!';
           }.bind($event.currentTarget));
       };
       $scope.tabs = [{"index": 1, "label": "Trending Instagram", "sortBy":""},
