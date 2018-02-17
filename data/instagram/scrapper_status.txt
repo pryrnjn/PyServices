@@ -147,3 +147,18 @@
 [2018-Feb-16 18:59:05 IST] - updating data from scrapped data
 [2018-Feb-16 18:59:05 IST] - refreshed in memory data from file
 [2018-Feb-16 20:37:09 IST] - writing updated score to file
+[2018-Feb-16 21:59:05 IST] - updating data from scrapped data
+[2018-Feb-16 21:59:06 IST] - refreshed in memory data from file
+[2018-Feb-17 00:59:06 IST] - updating data from scrapped data
+[2018-Feb-17 00:59:07 IST] - refreshed in memory data from file
+[2018-Feb-17 03:59:07 IST] - updating data from scrapped data
+[2018-Feb-17 03:59:08 IST] - refreshed in memory data from file
+[2018-Feb-17 06:59:08 IST] - updating data from scrapped data
+[2018-Feb-17 06:59:08 IST] - refreshed in memory data from file
+[2018-Feb-17 09:54:21 IST] - updating data from scrapped data
+[2018-Feb-17 09:54:23 IST] - refreshed in memory data from file
+[2018-Feb-17 09:54:30 IST] - updating data from scrapped data
+[2018-Feb-17 09:54:31 IST] - refreshed in memory data from file
+[2018-Feb-17 10:05:28 IST] - updating data from scrapped data
+[2018-Feb-17 10:05:28 IST] - refreshed in memory data from file
+[2018-Feb-17 10:07:28 IST] - writing updated score to file
