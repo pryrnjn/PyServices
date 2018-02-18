@@ -219,10 +219,13 @@ angular.module('myApplication')
 
                         }.bind(this), function(resp) {
                             var url = resp.config.url.toString().replace(/.*&url=/, '')
-                            var idx = this.items.indexOf(url);
-                            if (idx > -1)
-                                this.items.splice(idx, 1);
-                            this.notFoundItems.push(url);
+                            for (var i in this.items){
+                                if (this.items[i][0] === url){
+                                    this.items.splice(i, 1);
+                                    this.notFoundItems.push(url);
+                                    break;
+                                }
+                            }
                         }.bind(this))
                         .finally(function(){
                             this.progressCompleted();
