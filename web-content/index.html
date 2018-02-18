@@ -74,13 +74,14 @@
     </div>
     <div infinite-scroll='feed.nextPage()' infinite-scroll-disabled='feed.busy' infinite-scroll-distance='1'>
         <div id="feed" style="margin-left: 140px;">
-            <div id={{url}} ng-repeat="url in feed.items">
+            <div id={{item[0]}} ng-repeat="item in feed.items">
                 <div class="content"></div>
                 <div class="buttons">
                     <button class="action" ng-click="updateScore(url, 100, $event)">Superlike</button>
                     <button class="action" ng-click="updateScore(url, 10, $event)">Upvote</button>
                     <button class="action" ng-click="updateScore(url, -10, $event)">Downvote</button>
                     <button class="action" ng-click="updateScore(url, -100, $event)">Bhakk</button>
+                    <span>({{item[1]}})</span>
                 </div>
             </div>
         </div>
@@ -206,7 +207,7 @@ angular.module('myApplication')
                 if (!this.set.has(mediaUrl)){
                     this.set.add(mediaUrl);
                     if (this.items.length > 15) this.items.shift();
-                    this.items.push(mediaUrl);
+                    this.items.push([mediaUrl, items[i][3]]);
                         this.progressStarted();
                     $http.jsonp($sce.trustAsResourceUrl("http://api.instagram.com/oembed/?omitscript=true&url=" + mediaUrl))
                         .then(function(resp) {
