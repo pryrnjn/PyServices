@@ -18,7 +18,6 @@ last_modified_data = {'d': 0, 'header': [], 'scraped_date': 0, 'len': 0}
 loaded_data = []
 high_rated_data = []
 removed_data = []
-header = None
 score_data = dict()
 visitors = list()
 
@@ -27,6 +26,7 @@ def load_data():
     last_modified_data['d'] = os.path.getmtime(file_path)
     del loaded_data[:]
     del high_rated_data[:]
+
     with open(file_path, 'rb') as csv_file:
         reader = csv.reader(csv_file)
         last_modified_data['header'] = reader.next()
@@ -65,23 +65,24 @@ def execute_update(final=False):
             del visitors[:]
     if len(score_data):
         write_status("writing updated score to file")
+
+        rows = list()
+        urls = set()
+        with open(file_path, 'rb') as csv_file:
+            reader = csv.reader(csv_file)
+            header = reader.next()
+            for row in reader:
+                if row[1] not in urls:
+                    score = score_data.pop(row[1], 0)
+                    row[3] = int(row[3]) + score
+                    rows.append(row)
         with open(file_path, 'wb') as csv_file:
             writer = csv.writer(csv_file)
-            writer.writerow(last_modified_data['header'])
-            for row in loaded_data:
-                score = score_data.pop(row[1], 0)
-                row[3] = int(row[3]) + score
-                writer.writerow(row)
-
-            for row in removed_data:
-                score = score_data.pop(row[1], 0)
-                row[3] = int(row[3]) + score
-                writer.writerow(row)
-
-        last_modified_data['d'] = os.path.getmtime(file_path)
-        loaded_data.sort(key=lambda x: (date_matcher.match(x[2]).group(), int(x[3])), reverse=True)
+            writer.writerow(header)
+            writer.writerows(rows)
     if not final:
-        threading.Timer(120, execute_update).start()
+        refresh_data()
+        threading.Timer(10, execute_update).start()
 
 
 def update_data_csv():
@@ -154,6 +155,8 @@ class TopTrendingController:
         try:
             feed = loaded_data[offset:offset + limit]
             if sort_by == "date":
+                # indices = random.sample(xrange(last_modified_data['len']), 5)
+                # response["feed"] = [loaded_data[i] for i in indices]
                 response["feed"] = loaded_data[offset:offset + limit]
             elif sort_by == "score":
                 indices = random.sample(xrange(len(high_rated_data)), 5)
