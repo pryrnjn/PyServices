@@ -162,3 +162,34 @@
 [2018-Feb-17 10:05:28 IST] - updating data from scrapped data
 [2018-Feb-17 10:05:28 IST] - refreshed in memory data from file
 [2018-Feb-17 10:07:28 IST] - writing updated score to file
+[2018-Feb-17 10:09:30 IST] - writing updated score to file
+[2018-Feb-17 10:35:31 IST] - writing updated score to file
+[2018-Feb-17 10:37:32 IST] - writing updated score to file
+[2018-Feb-17 11:43:33 IST] - writing updated score to file
+[2018-Feb-17 11:45:34 IST] - writing updated score to file
+[2018-Feb-17 12:35:28 IST] - updating data from scrapped data
+[2018-Feb-17 12:35:29 IST] - refreshed in memory data from file
+[2018-Feb-17 15:35:29 IST] - updating data from scrapped data
+[2018-Feb-17 15:35:30 IST] - refreshed in memory data from file
+[2018-Feb-17 18:35:30 IST] - updating data from scrapped data
+[2018-Feb-17 18:35:31 IST] - refreshed in memory data from file
+[2018-Feb-17 20:41:35 IST] - writing updated score to file
+[2018-Feb-17 20:43:39 IST] - writing updated score to file
+[2018-Feb-17 20:45:42 IST] - writing updated score to file
+[2018-Feb-17 20:47:45 IST] - writing updated score to file
+[2018-Feb-17 20:49:49 IST] - writing updated score to file
+[2018-Feb-17 20:51:52 IST] - writing updated score to file
+[2018-Feb-17 20:53:55 IST] - writing updated score to file
+[2018-Feb-17 20:55:58 IST] - writing updated score to file
+[2018-Feb-17 20:58:01 IST] - writing updated score to file
+[2018-Feb-17 21:00:04 IST] - writing updated score to file
+[2018-Feb-17 21:02:07 IST] - writing updated score to file
+[2018-Feb-17 21:04:10 IST] - writing updated score to file
+[2018-Feb-17 21:16:13 IST] - writing updated score to file
+[2018-Feb-17 21:18:16 IST] - writing updated score to file
+[2018-Feb-17 21:35:31 IST] - updating data from scrapped data
+[2018-Feb-17 21:35:34 IST] - refreshed in memory data from file
+[2018-Feb-17 23:48:20 IST] - writing updated score to file
+[2018-Feb-18 10:40:26 IST] - writing updated score to file
+[2018-Feb-18 10:42:31 IST] - writing updated score to file
+[2018-Feb-18 10:44:37 IST] - writing updated score to file
