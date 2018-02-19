@@ -5755,3 +5755,15 @@
 [2018-Feb-19 06:27:27 IST] - refreshed in memory data from file
 [2018-Feb-19 06:27:37 IST] - writing updated score to file
 [2018-Feb-19 06:27:38 IST] - refreshed in memory data from file
+[2018-Feb-19 09:31:50 IST] - updating data from scrapped data
+[2018-Feb-19 09:31:50 IST] - refreshed in memory data from file
+[2018-Feb-19 09:32:30 IST] - updating data from scrapped data
+[2018-Feb-19 09:32:30 IST] - refreshed in memory data from file
+[2018-Feb-19 09:33:10 IST] - updating data from scrapped data
+[2018-Feb-19 09:33:10 IST] - refreshed in memory data from file
+[2018-Feb-19 09:35:17 IST] - writing updated score to file
+[2018-Feb-19 09:35:17 IST] - refreshed in memory data from file
+[2018-Feb-19 09:37:24 IST] - writing updated score to file
+[2018-Feb-19 09:37:24 IST] - refreshed in memory data from file
+[2018-Feb-19 09:39:31 IST] - writing updated score to file
+[2018-Feb-19 09:39:31 IST] - refreshed in memory data from file
