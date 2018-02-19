@@ -80,10 +80,10 @@
             <div id={{item[0]}} ng-repeat="item in feed.items">
                 <div class="content"></div>
                 <div class="buttons">
-                    <button class="action" ng-click="updateScore(url, 100, $event)">Superlike</button>
-                    <button class="action" ng-click="updateScore(url, 10, $event)">Upvote</button>
-                    <button class="action" ng-click="updateScore(url, -10, $event)">Downvote</button>
-                    <button class="action" ng-click="updateScore(url, -100, $event)">Bhakk</button>
+                    <button class="action" ng-click="updateScore(item, 100, $event);">Superlike</button>
+                    <button class="action" ng-click="updateScore(item, 10, $event)">Upvote</button>
+                    <button class="action" ng-click="updateScore(item, -10, $event)">Downvote</button>
+                    <button class="action" ng-click="updateScore(item, -100, $event)">Bhakk</button>
                     <span>({{item[1]}})</span>
                 </div>
             </div>
@@ -158,7 +158,9 @@ angular.module('myApplication', ['infinite-scroll']);
 
 angular.module('myApplication')
   .controller('AppController', function($scope, InstaFeed, $location){
-      $scope.updateScore = function(url, score, $event) {
+      $scope.updateScore = function(item, score, $event) {
+          var url = item[0];
+          item[1] = item[1]*1 + score;
           $.get('/trending/update?url='+url+'&score='+score, function(resp){
             console.log("update status "+ resp.updated);
             if (this.textContent.endsWith('!'))
