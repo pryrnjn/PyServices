@@ -42,12 +42,13 @@ def load_data():
     write_status("refreshed in memory data from file")
 
 
-def refresh_data():
+def refresh_data(start_timer=True):
     if os.path.getmtime(scraped_data_file) > last_modified_data['scraped_date']:
         update_data_csv()
     if os.path.getmtime(file_path) > last_modified_data['d']:
         load_data()
-    threading.Timer(1800, refresh_data).start()
+    if start_timer:
+        threading.Timer(1801, refresh_data).start()
 
 
 def update_score(url, score):
@@ -81,8 +82,8 @@ def execute_update(final=False):
             writer.writerow(header)
             writer.writerows(rows)
     if not final:
-        refresh_data()
-        threading.Timer(10, execute_update).start()
+        refresh_data(False)
+        threading.Timer(127, execute_update).start()
 
 
 def update_data_csv():
